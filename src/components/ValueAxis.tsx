@@ -1,4 +1,3 @@
-"use strict";
 /**
  *  Copyright (c) 2015-present, The Regents of the University of California,
  *  through Lawrence Berkeley National Laboratory (subject to receipt
@@ -8,12 +7,10 @@
  *  This source code is licensed under the BSD-style license found in the
  *  LICENSE file in the root directory of this source tree.
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-exports.__esModule = true;
-var react_1 = __importDefault(require("react"));
-var prop_types_1 = __importDefault(require("prop-types"));
+
+import React from "react";
+import PropTypes from "prop-types";
+
 /**
  * Renders a 'axis' that display a label for a current tracker value:
  * ```
@@ -28,47 +25,73 @@ var prop_types_1 = __importDefault(require("prop-types"));
  * end of the row and supply it with the current value. See the cycling example
  * for how that would all work.
  */
-var ValueAxis = function (_a) {
-    var width = _a.width, height = _a.height, value = _a.value, detail = _a.detail;
-    var labelStyle = {
+const ValueAxis = ({ width, height, value, detail }) => {
+    const labelStyle: any = {
         fill: "#666",
         fontSize: 20,
         textAnchor: "middle"
     };
-    var detailStyle = {
+    const detailStyle: any = {
         fontSize: 12,
         textAnchor: "middle",
         fill: "#9a9a9a"
     };
-    return (react_1["default"].createElement("g", null,
-        react_1["default"].createElement("rect", { key: "background", x: "0", y: "0", width: width, height: height, style: { fill: "none", stroke: "none" } }),
-        react_1["default"].createElement("text", { key: "value", x: parseInt(width / 2, 10), y: height / 2, style: labelStyle }, value),
-        react_1["default"].createElement("text", { key: "detail", x: parseInt(width / 2, 10), y: height / 2, dy: "1.2em", style: detailStyle }, detail)));
+    return (
+        <g>
+            <rect
+                key="background"
+                x="0"
+                y="0"
+                width={width}
+                height={height}
+                style={{ fill: "none", stroke: "none" }}
+            />
+            <text key="value" x={parseInt(width / 2 as any, 10)} y={height / 2} style={labelStyle}>
+                {value}
+            </text>
+            <text
+                key="detail"
+                x={parseInt(width / 2 as any, 10)}
+                y={height / 2}
+                dy="1.2em"
+                style={detailStyle}
+            >
+                {detail}
+            </text>
+        </g>
+    );
 };
+
 ValueAxis.propTypes = {
     /**
      * Show or hide this
      */
-    visible: prop_types_1["default"].bool,
+    visible: PropTypes.bool,
+
     /**
      * If values are numbers, use this format string
      */
-    value: prop_types_1["default"].oneOfType([prop_types_1["default"].string, prop_types_1["default"].number]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+
     /**
      * Use this to show what units are being used. It will appear below
      * the value.
      */
-    detail: prop_types_1["default"].string,
+    detail: PropTypes.string,
+
     /**
      * The width of the axis
      */
-    width: prop_types_1["default"].number,
+    width: PropTypes.number,
+
     /**
      * [Internal] The height of the axis
      */
-    height: prop_types_1["default"].number
+    height: PropTypes.number
 };
+
 ValueAxis.defaultProps = {
     visible: true
 };
-exports["default"] = ValueAxis;
+
+export default ValueAxis;

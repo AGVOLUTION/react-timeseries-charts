@@ -1,4 +1,3 @@
-"use strict";
 /**
  *  Copyright (c) 2015-present, The Regents of the University of California,
  *  through Lawrence Berkeley National Laboratory (subject to receipt
@@ -8,85 +7,64 @@
  *  This source code is licensed under the BSD-style license found in the
  *  LICENSE file in the root directory of this source tree.
  */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-exports.__esModule = true;
-var underscore_1 = __importDefault(require("underscore"));
-var merge_1 = __importDefault(require("merge"));
-var react_1 = __importDefault(require("react"));
-var d3_shape_1 = require("d3-shape");
-var prop_types_1 = __importDefault(require("prop-types"));
-var pondjs_1 = require("pondjs");
-var curve_1 = __importDefault(require("../js/curve"));
-var styler_1 = require("../js/styler");
-var util_1 = require("../js/util");
-var defaultFillStyle = {
+
+import _ from "underscore";
+import merge from "merge";
+import React from "react";
+
+import { area } from "d3-shape";
+import PropTypes, { InferProps } from "prop-types";
+
+import { Event, TimeEvent, IndexedEvent, max, median, min, percentile, TimeSeries } from "pondjs";
+
+import curves from "../js/curve";
+import { Styler } from "../js/styler";
+import { scaleAsString } from "../js/util";
+
+const defaultFillStyle: any = {
     fill: "steelblue",
     stroke: "none"
 };
-var defaultMutedStyle = {
+
+const defaultMutedStyle: any = {
     fill: "grey",
     stroke: "none"
 };
-var defaultStyle = [
+
+const defaultStyle = [
     {
-        normal: __assign(__assign({}, defaultFillStyle), { opacity: 0.2 }),
-        highlighted: __assign(__assign({}, defaultFillStyle), { opacity: 0.3 }),
-        selected: __assign(__assign({}, defaultFillStyle), { opacity: 0.3 }),
-        muted: __assign(__assign({}, defaultMutedStyle), { opacity: 0.1 })
+        normal: { ...defaultFillStyle, opacity: 0.2 },
+        highlighted: { ...defaultFillStyle, opacity: 0.3 },
+        selected: { ...defaultFillStyle, opacity: 0.3 },
+        muted: { ...defaultMutedStyle, opacity: 0.1 }
     },
     {
-        normal: __assign(__assign({}, defaultFillStyle), { opacity: 0.5 }),
-        highlighted: __assign(__assign({}, defaultFillStyle), { opacity: 0.6 }),
-        selected: __assign(__assign({}, defaultFillStyle), { opacity: 0.6 }),
-        muted: __assign(__assign({}, defaultMutedStyle), { opacity: 0.2 })
+        normal: { ...defaultFillStyle, opacity: 0.5 },
+        highlighted: { ...defaultFillStyle, opacity: 0.6 },
+        selected: { ...defaultFillStyle, opacity: 0.6 },
+        muted: { ...defaultMutedStyle, opacity: 0.2 }
     },
     {
-        normal: __assign(__assign({}, defaultFillStyle), { opacity: 0.9 }),
-        highlighted: __assign(__assign({}, defaultFillStyle), { opacity: 1.0 }),
-        selected: __assign(__assign({}, defaultFillStyle), { opacity: 1.0 }),
-        muted: __assign(__assign({}, defaultMutedStyle), { opacity: 0.2 })
+        normal: { ...defaultFillStyle, opacity: 0.9 },
+        highlighted: { ...defaultFillStyle, opacity: 1.0 },
+        selected: { ...defaultFillStyle, opacity: 1.0 },
+        muted: { ...defaultMutedStyle, opacity: 0.2 }
     }
 ];
-var defaultAggregation = {
+
+const defaultAggregation: any = {
     size: "5m",
     reducers: {
-        outer: [(0, pondjs_1.min)(), (0, pondjs_1.max)()],
-        inner: [(0, pondjs_1.percentile)(25), (0, pondjs_1.percentile)(75)],
-        center: (0, pondjs_1.median)()
+        outer: [min(), max()],
+        inner: [percentile(25), percentile(75)],
+        center: median()
     }
 };
+
 function getSeries(series, column) {
-    return series.map(function (e) {
-        var v = e.get(column);
-        var d = {};
+    return series.map(e => {
+        const v = e.get(column);
+        const d: any = {};
         switch (v.length) {
             case 1:
                 d.center = v[0];
@@ -116,36 +94,43 @@ function getSeries(series, column) {
             default:
                 console.error("Tried to make boxchart from invalid array");
         }
-        var ee = new pondjs_1.IndexedEvent(e.index(), d);
+        const ee = new IndexedEvent(e.index(), d);
         return ee;
     });
 }
-function getAggregatedSeries(series, column, aggregation) {
-    if (aggregation === void 0) { aggregation = defaultAggregation; }
-    var size = aggregation.size, reducers = aggregation.reducers;
-    var inner = reducers.inner, outer = reducers.outer, center = reducers.center;
+
+function getAggregatedSeries(series, column, aggregation = defaultAggregation) {
+    const { size, reducers } = aggregation;
+    const { inner, outer, center } = reducers;
+
     function mapColumn(c, r) {
-        var obj = {};
+        const obj: any = {};
         obj[c] = r;
         return obj;
     }
-    var fixedWindowAggregation = {};
+
+    const fixedWindowAggregation: any = {};
+
     if (inner) {
         fixedWindowAggregation.innerMin = mapColumn(column, inner[0]);
         fixedWindowAggregation.innerMax = mapColumn(column, inner[1]);
     }
+
     if (outer) {
         fixedWindowAggregation.outerMin = mapColumn(column, outer[0]);
         fixedWindowAggregation.outerMax = mapColumn(column, outer[1]);
     }
+
     if (center) {
         fixedWindowAggregation.center = mapColumn(column, center);
     }
+
     return series.fixedWindowRollup({
         windowSize: size,
         aggregation: fixedWindowAggregation
     });
 }
+
 /**
  * Renders a band chart.
  *
@@ -209,80 +194,103 @@ function getAggregatedSeries(series, column, aggregation) {
  *    />
  * ```
  */
-var BandChart = /** @class */ (function (_super) {
-    __extends(BandChart, _super);
-    function BandChart(props) {
-        var _this = _super.call(this, props) || this;
-        if (props.series._collection._type === pondjs_1.TimeEvent // eslint-disable-line
+export default class BandChart extends React.Component<InferProps<typeof BandChart.propTypes>> {
+    providedStyle: any;
+    selectedStyle: any;
+    highlightedStyle: any;
+    mutedStyle: any;
+    normalStyle: any;
+    series: any;
+    constructor(props) {
+        super(props);
+        if (
+            props.series._collection._type === TimeEvent // eslint-disable-line
         ) {
-            _this.series = getAggregatedSeries(props.series, props.column, props.aggregation);
+            this.series = getAggregatedSeries(props.series, props.column, props.aggregation);
+        } else {
+            this.series = getSeries(props.series, props.column);
         }
-        else {
-            _this.series = getSeries(props.series, props.column);
-        }
-        return _this;
     }
-    BandChart.prototype.componentWillReceiveProps = function (nextProps) {
-        var aggregation = nextProps.aggregation;
-        var aggregationChanged = false;
-        if (underscore_1["default"].isUndefined(aggregation) !== underscore_1["default"].isUndefined(this.props.aggregation)) {
+
+    componentWillReceiveProps(nextProps) {
+        const aggregation = nextProps.aggregation;
+
+        let aggregationChanged = false;
+        if (_.isUndefined(aggregation) !== _.isUndefined(this.props.aggregation)) {
             aggregationChanged = true;
         }
+
         if (aggregation && this.props.aggregation) {
             if (aggregation.size !== this.props.aggregation.size) {
                 aggregationChanged = true;
             }
         }
+
         if (aggregationChanged) {
-            this.series = getAggregatedSeries(nextProps.series, nextProps.column, nextProps.aggregation);
+            this.series = getAggregatedSeries(
+                nextProps.series,
+                nextProps.column,
+                nextProps.aggregation
+            );
         }
-    };
-    BandChart.prototype.shouldComponentUpdate = function (nextProps) {
-        var newSeries = nextProps.series;
-        var oldSeries = this.props.series;
-        var width = nextProps.width;
-        var timeScale = nextProps.timeScale;
-        var yScale = nextProps.yScale;
-        var column = nextProps.column;
-        var style = nextProps.style;
-        var aggregation = nextProps.aggregation;
-        var highlighted = nextProps.highlighted;
-        var selected = nextProps.selected;
-        var widthChanged = this.props.width !== width;
-        var timeScaleChanged = (0, util_1.scaleAsString)(this.props.timeScale) !== (0, util_1.scaleAsString)(timeScale);
-        var yAxisScaleChanged = this.props.yScale !== yScale;
-        var columnChanged = this.props.column !== column;
-        var styleChanged = JSON.stringify(this.props.style) !== JSON.stringify(style);
-        var highlightedChanged = this.props.highlighted !== highlighted;
-        var selectedChanged = this.props.selected !== selected;
-        var aggregationChanged = false;
-        if (underscore_1["default"].isUndefined(aggregation) !== underscore_1["default"].isUndefined(this.props.aggregation)) {
+    }
+
+    shouldComponentUpdate(nextProps) {
+        const newSeries = nextProps.series;
+        const oldSeries = this.props.series;
+        const width = nextProps.width;
+        const timeScale = nextProps.timeScale;
+        const yScale = nextProps.yScale;
+        const column = nextProps.column;
+        const style = nextProps.style;
+        const aggregation = nextProps.aggregation;
+        const highlighted = nextProps.highlighted;
+        const selected = nextProps.selected;
+
+        const widthChanged = this.props.width !== width;
+        const timeScaleChanged = scaleAsString(this.props.timeScale) !== scaleAsString(timeScale);
+        const yAxisScaleChanged = this.props.yScale !== yScale;
+        const columnChanged = this.props.column !== column;
+        const styleChanged = JSON.stringify(this.props.style) !== JSON.stringify(style);
+        const highlightedChanged = this.props.highlighted !== highlighted;
+        const selectedChanged = this.props.selected !== selected;
+
+        let aggregationChanged = false;
+        if (_.isUndefined(aggregation) !== _.isUndefined(this.props.aggregation)) {
             aggregationChanged = true;
         }
+
         if (aggregation && this.props.aggregation) {
             if (aggregation.size !== this.props.aggregation.size) {
                 aggregationChanged = true;
             }
         }
-        var seriesChanged = false;
+
+        let seriesChanged = false;
         if (oldSeries.size() !== newSeries.size()) {
             seriesChanged = true;
+        } else {
+            seriesChanged = !TimeSeries.is(oldSeries, newSeries);
         }
-        else {
-            seriesChanged = !pondjs_1.TimeSeries.is(oldSeries, newSeries);
-        }
+
         // If the series changes we need to rebuild this.series with
         // the incoming props
         if (seriesChanged) {
-            if (nextProps.series._collection._type === pondjs_1.TimeEvent // eslint-disable-line
+            if (
+                nextProps.series._collection._type === TimeEvent // eslint-disable-line
             ) {
-                this.series = getAggregatedSeries(nextProps.series, nextProps.column, nextProps.aggregation);
-            }
-            else {
+                this.series = getAggregatedSeries(
+                    nextProps.series,
+                    nextProps.column,
+                    nextProps.aggregation
+                );
+            } else {
                 this.series = getSeries(nextProps.series, nextProps.column);
             }
         }
-        return (seriesChanged ||
+
+        return (
+            seriesChanged ||
             timeScaleChanged ||
             widthChanged ||
             columnChanged ||
@@ -290,174 +298,239 @@ var BandChart = /** @class */ (function (_super) {
             yAxisScaleChanged ||
             aggregationChanged ||
             highlightedChanged ||
-            selectedChanged);
-    };
-    BandChart.prototype.handleHover = function (e, event) {
+            selectedChanged
+        );
+    }
+
+    handleHover(e, event) {
         if (this.props.onHighlightChange) {
             this.props.onHighlightChange(event);
         }
-    };
-    BandChart.prototype.handleHoverLeave = function () {
+    }
+
+    handleHoverLeave() {
         if (this.props.onHighlightChange) {
             this.props.onHighlightChange(null);
         }
-    };
-    BandChart.prototype.handleClick = function (e, event) {
+    }
+
+    handleClick(e, event) {
         if (this.props.onSelectionChange) {
             this.props.onSelectionChange(event);
         }
         e.stopPropagation();
-    };
-    BandChart.prototype.providedStyleArray = function (column) {
-        var style = {};
+    }
+
+    providedStyleArray(column) {
+        let style = {};
         if (this.props.style) {
-            if (this.props.style instanceof styler_1.Styler) {
+            if (this.props.style instanceof Styler) {
                 style = this.props.style.boxChartStyle()[column];
-            }
-            else if (underscore_1["default"].isFunction(this.props.style)) {
-                style = this.props.style(column);
-            }
-            else if (underscore_1["default"].isObject(this.props.style)) {
+            } else if (_.isFunction(this.props.style)) {
+                style = (this.props.style as Function)(column);
+            } else if (_.isObject(this.props.style)) {
                 style = this.props.style ? this.props.style[column] : defaultStyle;
             }
         }
         return style;
-    };
+    }
+
     /**
      * Returns the style used for drawing the path
      */
-    BandChart.prototype.style = function (column, event, level) {
-        var style;
+    style(column, event, level) {
+        let style;
         if (!this.providedStyle) {
             this.providedStyle = this.providedStyleArray(this.props.column);
         }
-        if (!underscore_1["default"].isNull(this.providedStyle) &&
-            (!underscore_1["default"].isArray(this.providedStyle) || this.providedStyle.length !== 3)) {
+
+        if (
+            !_.isNull(this.providedStyle) &&
+            (!_.isArray(this.providedStyle) || this.providedStyle.length !== 3)
+        ) {
             console.warn("Provided style to BandChart should be an array of 3 objects");
             return defaultStyle;
         }
-        var isHighlighted = this.props.highlighted && pondjs_1.Event.is(this.props.highlighted, event);
-        var isSelected = this.props.selected && pondjs_1.Event.is(this.props.selected, event);
+
+        const isHighlighted = this.props.highlighted && Event.is(this.props.highlighted, event);
+
+        const isSelected = this.props.selected && Event.is(this.props.selected, event);
+
         if (this.props.selected) {
             if (isSelected) {
                 if (!this.selectedStyle || !this.selectedStyle[level]) {
                     if (!this.selectedStyle) {
                         this.selectedStyle = [];
                     }
-                    this.selectedStyle[level] = (0, merge_1["default"])(true, defaultStyle[level].selected, this.providedStyle[level].selected ? this.providedStyle[level].selected : {});
+                    this.selectedStyle[level] = merge(
+                        true,
+                        defaultStyle[level].selected,
+                        this.providedStyle[level].selected ? this.providedStyle[level].selected : {}
+                    );
                 }
                 style = this.selectedStyle[level];
-            }
-            else if (isHighlighted) {
+            } else if (isHighlighted) {
                 if (!this.highlightedStyle || !this.highlightedStyle[level]) {
                     if (!this.highlightedStyle) {
                         this.highlightedStyle = [];
                     }
-                    this.highlightedStyle[level] = (0, merge_1["default"])(true, defaultStyle[level].highlighted, this.providedStyle[level].highlighted
-                        ? this.providedStyle[level].highlighted
-                        : {});
+                    this.highlightedStyle[level] = merge(
+                        true,
+                        defaultStyle[level].highlighted,
+                        this.providedStyle[level].highlighted
+                            ? this.providedStyle[level].highlighted
+                            : {}
+                    );
                 }
                 style = this.highlightedStyle[level];
-            }
-            else {
+            } else {
                 if (!this.mutedStyle) {
                     this.mutedStyle = [];
                 }
                 if (!this.mutedStyle[level]) {
-                    this.mutedStyle[level] = (0, merge_1["default"])(true, defaultStyle[level].muted, this.providedStyle[level].muted ? this.providedStyle[level].muted : {});
+                    this.mutedStyle[level] = merge(
+                        true,
+                        defaultStyle[level].muted,
+                        this.providedStyle[level].muted ? this.providedStyle[level].muted : {}
+                    );
                 }
                 style = this.mutedStyle[level];
             }
-        }
-        else if (isHighlighted) {
-            style = (0, merge_1["default"])(true, defaultStyle[level].highlighted, this.providedStyle[level].highlighted ? this.providedStyle[level].highlighted : {});
-        }
-        else {
+        } else if (isHighlighted) {
+            style = merge(
+                true,
+                defaultStyle[level].highlighted,
+                this.providedStyle[level].highlighted ? this.providedStyle[level].highlighted : {}
+            );
+        } else {
             if (!this.normalStyle) {
                 this.normalStyle = [];
             }
             if (!this.normalStyle[level]) {
-                this.normalStyle[level] = (0, merge_1["default"])(true, defaultStyle[level].normal, this.providedStyle[level].normal ? this.providedStyle[level].normal : {});
+                this.normalStyle[level] = merge(
+                    true,
+                    defaultStyle[level].normal,
+                    this.providedStyle[level].normal ? this.providedStyle[level].normal : {}
+                );
             }
             style = this.normalStyle[level];
         }
         return style;
-    };
-    BandChart.prototype.renderAreas = function () {
-        var _this = this;
-        var column = this.props.column;
-        var areas = [];
-        var styles = [];
+    }
+
+    renderAreas() {
+        const { column } = this.props;
+
+        const areas = [];
+
+        const styles = [];
         styles[0] = this.style(column, event, 0); // eslint-disable-line
         styles[1] = this.style(column, event, 1); // eslint-disable-line
         styles[2] = this.style(column, event, 2); // eslint-disable-line
+
         // Use D3 to build an area generation function
-        var areaGenerator = (0, d3_shape_1.area)()
-            .curve(curve_1["default"][this.props.interpolation])
-            .x(function (d) { return d.x0; })
-            .y0(function (d) { return d.y0; })
-            .y1(function (d) { return d.y1; });
-        var columns = this.series.columns();
+        const areaGenerator = area()
+            .curve(curves[this.props.interpolation])
+            .x(d => d.x0)
+            .y0(d => d.y0)
+            .y1(d => d.y1);
+
+        const columns = this.series.columns();
+
         // How many areas are we drawing
-        var hasInner = true;
-        var hasOuter = true;
-        if (underscore_1["default"].has(columns, "innerMin") || underscore_1["default"].has(columns, "innerMax")) {
+        let hasInner = true;
+        let hasOuter = true;
+        if (_.has(columns, "innerMin") || _.has(columns, "innerMax")) {
             hasInner = false;
         }
-        if (underscore_1["default"].has(columns, "outerMin") || underscore_1["default"].has(columns, "outerMax")) {
+        if (_.has(columns, "outerMin") || _.has(columns, "outerMax")) {
             hasOuter = false;
         }
+
         // Build the outer area if we have one
         if (hasOuter) {
-            var level = 0;
+            let level = 0;
             if (!hasInner) {
                 level += 1;
             }
-            var outerData = [];
-            for (var j = 0; j < this.series.size(); j += 1) {
-                var e = this.series.at(j);
-                var timestamp = new Date(e.begin().getTime() + (e.end().getTime() - e.begin().getTime()) / 2);
+
+            const outerData = [];
+            for (let j = 0; j < this.series.size(); j += 1) {
+                const e = this.series.at(j);
+                const timestamp = new Date(
+                    e.begin().getTime() + (e.end().getTime() - e.begin().getTime()) / 2
+                );
                 outerData.push({
                     x0: this.props.timeScale(timestamp),
                     y0: this.props.yScale(e.get("outerMin")),
                     y1: this.props.yScale(e.get("outerMax"))
                 });
             }
-            var outerAreaPath = areaGenerator(outerData);
-            areas.push(react_1["default"].createElement("g", { key: "area-outer" },
-                react_1["default"].createElement("path", { d: outerAreaPath, style: styles[level], onClick: function (e) { return _this.handleClick(e, column); }, onMouseLeave: function () { return _this.handleHoverLeave(); }, onMouseMove: function (e) { return _this.handleHover(e, column); } })));
+
+            const outerAreaPath = areaGenerator(outerData);
+
+            areas.push(
+                <g key={`area-outer`}>
+                    <path
+                        d={outerAreaPath}
+                        style={styles[level]}
+                        onClick={e => this.handleClick(e, column)}
+                        onMouseLeave={() => this.handleHoverLeave()}
+                        onMouseMove={e => this.handleHover(e, column)}
+                    />
+                </g>
+            );
         }
+
         if (hasInner) {
-            var level = 0;
+            let level = 0;
             if (!hasInner) {
                 level += 1;
             }
-            var innerData = [];
-            for (var j = 0; j < this.series.size(); j += 1) {
-                var e = this.series.at(j);
-                var timestamp = new Date(e.begin().getTime() + (e.end().getTime() - e.begin().getTime()) / 2);
+
+            const innerData = [];
+            for (let j = 0; j < this.series.size(); j += 1) {
+                const e = this.series.at(j);
+                const timestamp = new Date(
+                    e.begin().getTime() + (e.end().getTime() - e.begin().getTime()) / 2
+                );
                 innerData.push({
                     x0: this.props.timeScale(timestamp),
                     y0: this.props.yScale(e.get("innerMin")),
                     y1: this.props.yScale(e.get("innerMax"))
                 });
             }
-            var innerAreaPath = areaGenerator(innerData);
-            areas.push(react_1["default"].createElement("g", { key: "area-inner" },
-                react_1["default"].createElement("path", { d: innerAreaPath, style: styles[level], onClick: function (e) { return _this.handleClick(e, column); }, onMouseLeave: function () { return _this.handleHoverLeave(); }, onMouseMove: function (e) { return _this.handleHover(e, column); } })));
+
+            const innerAreaPath = areaGenerator(innerData);
+
+            areas.push(
+                <g key={`area-inner`}>
+                    <path
+                        d={innerAreaPath}
+                        style={styles[level]}
+                        onClick={e => this.handleClick(e, column)}
+                        onMouseLeave={() => this.handleHoverLeave()}
+                        onMouseMove={e => this.handleHover(e, column)}
+                    />
+                </g>
+            );
         }
-        return react_1["default"].createElement("g", null, areas);
-    };
-    BandChart.prototype.render = function () {
-        return react_1["default"].createElement("g", null, this.renderAreas());
-    };
-    BandChart.propTypes = {
+
+        return <g>{areas}</g>;
+    }
+
+    render() {
+        return <g>{this.renderAreas()}</g>;
+    }
+    
+    static propTypes = {
         /**
          * What [Pond TimeSeries](http://software.es.net/pond#timeseries)
          * data to visualize. See general notes on the BandChart.
          */
         // series: PropTypes.instanceOf(TimeSeries).isRequired,
-        series: prop_types_1["default"].any.isRequired,
+        series: PropTypes.any.isRequired,
+
         /*
         series: (props, propName, componentName) => {
             const value = props[propName];
@@ -473,16 +546,19 @@ var BandChart = /** @class */ (function (_super) {
             return null;
         },
         */
+
         /**
          * The column within the TimeSeries to plot. Unlike other charts, the BandChart
          * works on just a single column.
-         *
-         * NOTE : Columns can't have periods because periods
-         * represent a path to deep data in the underlying events
+         * 
+         * NOTE : Columns can't have periods because periods 
+         * represent a path to deep data in the underlying events 
          * (i.e. reference into nested data structures)
          */
-        column: prop_types_1["default"].string,
-        interpolation: prop_types_1["default"].any,
+        column: PropTypes.string,
+
+        interpolation: PropTypes.any,
+
         /**
          * The aggregation specification. This object should contain:
          *   - innerMax
@@ -507,103 +583,122 @@ var BandChart = /** @class */ (function (_super) {
          *     }
          * ```
          */
-        aggregation: prop_types_1["default"].shape({
-            size: prop_types_1["default"].string,
-            reducers: prop_types_1["default"].shape({
-                inner: prop_types_1["default"].arrayOf(prop_types_1["default"].func),
-                outer: prop_types_1["default"].arrayOf(prop_types_1["default"].func),
-                center: prop_types_1["default"].func // eslint-disable-line
+        aggregation: PropTypes.shape({
+            size: PropTypes.string,
+            reducers: PropTypes.shape({
+                inner: PropTypes.arrayOf(PropTypes.func), // eslint-disable-line
+                outer: PropTypes.arrayOf(PropTypes.func), // eslint-disable-line
+                center: PropTypes.func // eslint-disable-line
             })
-        }),
+        }), // eslint-disable-line
+
         /**
          * The style of the box chart drawing (using SVG CSS properties) or
          * a styler object. It is recommended to user the styler unless you need
          * detailed customization.
          */
-        style: prop_types_1["default"].oneOfType([prop_types_1["default"].object, prop_types_1["default"].func, prop_types_1["default"].instanceOf(styler_1.Styler)]),
+        style: PropTypes.oneOfType([PropTypes.object, PropTypes.func, PropTypes.instanceOf(Styler)]),
+
         /**
          * The style of the info box and connecting lines
          */
-        infoStyle: prop_types_1["default"].object,
+        infoStyle: PropTypes.object, //eslint-disable-line
+
         /**
          * The width of the hover info box
          */
-        infoWidth: prop_types_1["default"].number,
+        infoWidth: PropTypes.number, //eslint-disable-line
+
         /**
          * The height of the hover info box
          */
-        infoHeight: prop_types_1["default"].number,
+        infoHeight: PropTypes.number, //eslint-disable-line
+
         /**
          * The values to show in the info box. This is an array of
          * objects, with each object specifying the label and value
          * to be shown in the info box.
          */
-        info: prop_types_1["default"].arrayOf(prop_types_1["default"].shape({
-            //eslint-disable-line
-            label: prop_types_1["default"].string,
-            value: prop_types_1["default"].string //eslint-disable-line
-        })),
+        info: PropTypes.arrayOf(
+            PropTypes.shape({
+                //eslint-disable-line
+                label: PropTypes.string, //eslint-disable-line
+                value: PropTypes.string //eslint-disable-line
+            })
+        ),
+
         /**
          * If spacing is specified, then the boxes will be separated from the
          * timerange boundary by this number of pixels. Use this to space out
          * the boxes from each other. Inner and outer boxes are controlled
          * separately.
          */
-        innerSpacing: prop_types_1["default"].number,
+        innerSpacing: PropTypes.number,
+
         /**
          * If spacing is specified, then the boxes will be separated from the
          * timerange boundary by this number of pixels. Use this to space out
          * the boxes from each other. Inner and outer boxes are controlled
          * separately.
          */
-        outerSpacing: prop_types_1["default"].number,
+        outerSpacing: PropTypes.number,
+
         /**
          * If size is specified, then the innerBox will be this number of pixels wide. This
          * prop takes priority over "spacing".
          */
-        innerSize: prop_types_1["default"].number,
+        innerSize: PropTypes.number,
+
         /**
          * If size is specified, then the outer box will be this number of pixels wide. This
          * prop takes priority over "spacing".
          */
-        outerSize: prop_types_1["default"].number,
+        outerSize: PropTypes.number,
+
         /**
          * The selected item, which will be rendered in the "selected" style.
          * If a bar is selected, all other bars will be rendered in the "muted" style.
          *
          * See also `onSelectionChange`
          */
-        selected: prop_types_1["default"].instanceOf(pondjs_1.IndexedEvent),
+        selected: PropTypes.instanceOf(IndexedEvent),
+
         /**
          * The highlighted item, which will be rendered in the "highlighted" style.
          *
          * See also `onHighlightChange`
          */
-        highlighted: prop_types_1["default"].instanceOf(pondjs_1.IndexedEvent),
+        highlighted: PropTypes.instanceOf(IndexedEvent),
+
         /**
          * A callback that will be called when the selection changes. It will be called
          * with the event corresponding to the box clicked as its only arg.
          */
-        onSelectionChange: prop_types_1["default"].func,
+        onSelectionChange: PropTypes.func,
+
         /**
          * A callback that will be called when the hovered over box changes.
          * It will be called with the event corresponding to the box hovered over.
          */
-        onHighlightChange: prop_types_1["default"].func,
+        onHighlightChange: PropTypes.func,
+
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: prop_types_1["default"].func,
+        timeScale: PropTypes.func,
+
         /**
          * [Internal] The yScale supplied by the associated YAxis
          */
-        yScale: prop_types_1["default"].func,
+        yScale: PropTypes.func,
+
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: prop_types_1["default"].number
-    };
-    BandChart.defaultProps = {
+        width: PropTypes.number
+    }
+
+    static defaultProps = {
         column: "value",
         innerSpacing: 1.0,
         outerSpacing: 2.0,
@@ -624,7 +719,5 @@ var BandChart = /** @class */ (function (_super) {
         markerRadius: 2,
         infoWidth: 90,
         infoHeight: 30
-    };
-    return BandChart;
-}(react_1["default"].Component));
-exports["default"] = BandChart;
+    }
+}

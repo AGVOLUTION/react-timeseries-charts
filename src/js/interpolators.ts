@@ -1,4 +1,3 @@
-"use strict";
 /**
  *  Copyright (c) 2015, The Regents of the University of California,
  *  through Lawrence Berkeley National Laboratory (subject to receipt
@@ -8,69 +7,81 @@
  *  This source code is licensed under the BSD-style license found in the
  *  LICENSE file in the root directory of this source tree.
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-exports.__esModule = true;
-var underscore_1 = __importDefault(require("underscore"));
-var ScaleInterpolator = /** @class */ (function () {
-    function ScaleInterpolator(transition, ease, observer) {
-        this.id = underscore_1["default"].uniqueId("scaler");
+
+import _ from "underscore";
+
+export default class ScaleInterpolator {
+    id: any;
+    ease: any;
+    transitionTime: any;
+    observer: any;
+    sourceScale: any;
+    targetScale: any;
+    cachedScaler: any;
+    cacheKey: any;
+    initialTimestamp: any;
+    constructor(transition, ease, observer) {
+        this.id = _.uniqueId("scaler");
         this.ease = ease;
         this.transitionTime = transition;
         this.observer = observer;
+
         this.sourceScale = null;
         this.targetScale = null;
         this.cachedScaler = null;
         this.cacheKey = null;
     }
-    ScaleInterpolator.prototype.update = function () {
-        var _this = this;
-        var animationTime = 0;
+
+    update() {
+        let animationTime = 0;
+
         if (!this.initialTimestamp) {
             this.initialTimestamp = window.performance.now();
-        }
-        else {
+        } else {
             animationTime = window.performance.now() - this.initialTimestamp;
         }
-        var animationPosition = this.transitionTime
+
+        const animationPosition = this.transitionTime
             ? Math.min(animationTime / this.transitionTime, 1.0)
             : 1.0;
+
         if (!this.targetScale) {
             return;
         }
+
         if (this.observer) {
-            var func1_1 = this.sourceScale;
-            var func2_1 = this.targetScale;
-            var te_1 = this.ease(animationPosition);
-            var scaler = function (x) {
-                var a = func1_1(x);
-                var b = func2_1(x);
-                return a + (b - a) * te_1;
+            const func1 = this.sourceScale;
+            const func2 = this.targetScale;
+            const te = this.ease(animationPosition);
+            const scaler = x => {
+                const a = func1(x);
+                const b = func2(x);
+                return a + (b - a) * te;
             };
             this.observer(scaler);
         }
+
         if (animationPosition < 1.0) {
             // keep animating
-            setTimeout(function () { return _this.update(); }, 20);
-        }
-        else {
+            setTimeout(() => this.update(), 20);
+        } else {
             // reset
             this.sourceScale = this.targetScale;
             this.targetScale = null;
             this.initialTimestamp = null;
         }
-    };
+    }
+
     /**
    * A new (or initial) scale is set on the interpolator
    */
-    ScaleInterpolator.prototype.setScale = function (key, scale) {
-        var _this = this;
+    setScale(key, scale) {
         // Initial scale
         if (!this.sourceScale) {
             this.sourceScale = scale;
             return;
         }
+
         //
         //  If there was already a scale, and a new scale is set
         // the this begins an animation across between the two
@@ -78,14 +89,17 @@ var ScaleInterpolator = /** @class */ (function () {
         // this we set the new scale as the target and reset the
         // t to 0. (if there's no transition, jump to t = 1)
         //
+
         if (key !== this.cacheKey) {
             this.targetScale = scale;
             this.cachedScaler = null;
             this.initialTimestamp = null;
-            setTimeout(function () { return _this.update(); }, 0);
+            setTimeout(() => this.update(), 0);
         }
+
         this.cacheKey = key;
-    };
+    }
+
     /**
    * Returns a scaler, which is a function that scales the value
    * supplied to it. This return the scaler corresponding to the
@@ -94,27 +108,26 @@ var ScaleInterpolator = /** @class */ (function () {
    * callback will be called with the transitional scaler that can
    * be used to scale data to the intermediate state.
    */
-    ScaleInterpolator.prototype.scaler = function () {
-        var _this = this;
-        if (underscore_1["default"].isNull(this.cachedScaler)) {
-            this.cachedScaler = function (v) { return _this.sourceScale(v); };
+    scaler() {
+        if (_.isNull(this.cachedScaler)) {
+            this.cachedScaler = v => this.sourceScale(v);
         }
         return this.cachedScaler;
-    };
+    }
+
     /**
    * Returns the d3 scale. It will return the target scale if present
    * otherwise the source scale. Note: this is the d3 internal scale. To
    * scale values, use the scaler.
    */
-    ScaleInterpolator.prototype.latestScale = function () {
+    latestScale() {
         return this.targetScale ? this.targetScale : this.sourceScale;
-    };
+    }
+
     /**
    * Returns the transition, as set in the constructor
    */
-    ScaleInterpolator.prototype.transition = function () {
+    transition() {
         return this.transitionTime;
-    };
-    return ScaleInterpolator;
-}());
-exports["default"] = ScaleInterpolator;
+    }
+}
