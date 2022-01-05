@@ -458,7 +458,7 @@ export default class ChartContainer extends React.Component<ChartContainerProps>
         //
 
         React.Children.forEach(this.props.children, (childRow:any) => {
-            if (areComponentsEqual(childRow.type, ChartRow)) {
+            if (areComponentsEqual(childRow.type, ChartRow as any)) {
                 //
                 // Within this row, count the number of columns that will be
                 // left and right of the Charts tag, as well as the total number
@@ -471,7 +471,7 @@ export default class ChartContainer extends React.Component<ChartContainerProps>
 
                 React.Children.forEach(childRow.props.children, (child: JSX.Element) => {
                     if (child === null) return;
-                    if (child.type === Charts) {
+                    if (areComponentsEqual(child.type, Charts)) {
                         countCharts += 1;
                         align = "right";
                     } else if (
@@ -495,11 +495,11 @@ export default class ChartContainer extends React.Component<ChartContainerProps>
                 React.Children.forEach(childRow.props.children, (child: JSX.Element) => {
                     if (child === null) return;
                     if (
-                        child.type === Charts ||
-                        child.type === Brush ||
-                        child.type === MultiBrush
+                        areComponentsEqual(child.type, Charts) ||
+                        areComponentsEqual(child.type, Brush) ||
+                        areComponentsEqual(child.type, MultiBrush)
                     ) {
-                        if (child.type === Charts) {
+                        if (areComponentsEqual(child.type, Charts)) {
                             align = "right";
                             pos = 0;
                         }
@@ -587,7 +587,7 @@ export default class ChartContainer extends React.Component<ChartContainerProps>
         //yPosition += titleHeight;
         let chartsHeight = 0;
         React.Children.forEach(this.props.children, (child: any) => {
-            if (child.type === ChartRow) {
+            if (areComponentsEqual(child.type, ChartRow as any)) {
                 const chartRow = child;
                 const rowKey = `chart-row-row-${i}`;
                 const firstRow = i === 0;

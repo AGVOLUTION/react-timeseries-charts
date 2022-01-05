@@ -174,7 +174,7 @@ export default class ChartRow extends React.Component<ChartRowProps, any> {
     }
 
     isChildYAxis = (child: JSX.Element) =>
-        child.type === YAxis ||
+        areComponentsEqual(child.type, YAxis as any) ||
         (_.has(child.props, "min") && _.has(child.props, "max"));
 
     updateScales(props) {
@@ -266,7 +266,7 @@ export default class ChartRow extends React.Component<ChartRowProps, any> {
         let alignLeft = true;
         React.Children.forEach(this.props.children, (child: any) => {
             if (child === null) return;
-            if (child.type === Charts) {
+            if (areComponentsEqual(child.type, Charts)) {
                 alignLeft = false;
             } else {
                 const id = child.props.id;
@@ -392,7 +392,7 @@ export default class ChartRow extends React.Component<ChartRowProps, any> {
         let keyCount = 0;
         React.Children.forEach(this.props.children, (child: any) => {
             if (child === null) return;
-            if (child.type === Charts) {
+            if (areComponentsEqual(child.type, Charts)) {
                 const charts = child;
                 React.Children.forEach(charts.props.children, chart => {
                     if (!_.has(chart.props, "visible") || chart.props.visible) {
@@ -442,8 +442,8 @@ export default class ChartRow extends React.Component<ChartRowProps, any> {
         React.Children.forEach(this.props.children, (child: JSX.Element) => {
             if (child === null) return;
             if (
-                child.type === Brush ||
-                child.type === MultiBrush
+                areComponentsEqual(child.type, Brush) ||
+                areComponentsEqual(child.type, MultiBrush)
             ) {
                 const brushProps: any = {
                     key: `brush-${keyCount}`,
@@ -451,7 +451,7 @@ export default class ChartRow extends React.Component<ChartRowProps, any> {
                     height: innerHeight,
                     timeScale: this.props.timeScale
                 };
-                if (child.type === Brush) {
+                if (areComponentsEqual(child.type, Brush)) {
                     brushList.push(React.cloneElement(child, brushProps));
                 } else {
                     multiBrushList.push(React.cloneElement(child, brushProps));
