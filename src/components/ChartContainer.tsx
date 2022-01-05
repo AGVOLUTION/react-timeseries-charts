@@ -546,10 +546,10 @@ export default class ChartContainer extends React.Component<ChartContainerProps>
 
         const timeScale = (this.timeScale = this.props.utc
             ? scaleUtc()
-                  .domain(this.props.timeRange.toJSON() as [Date, Date])
+                  .domain([this.props.timeRange.begin().getTime(), this.props.timeRange.end().getTime()])
                   .range([0, timeAxisWidth])
             : scaleTime()
-                  .domain(this.props.timeRange.toJSON() as [Date, Date])
+                  .domain([this.props.timeRange.begin().getTime(), this.props.timeRange.end().getTime()])
                   .range([0, timeAxisWidth]));
 
         const chartsWidth = this.props.width - leftWidth - rightWidth - paddingLeft - paddingRight;
