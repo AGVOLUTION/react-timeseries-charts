@@ -357,13 +357,13 @@ export default class YAxis extends React.Component<YAxisProps> {
             .select("g")
             .selectAll(".tick")
             .select("text")
-            ["styles"](valueStyle);
+            .styles(valueStyle);
 
         select(ReactDOM.findDOMNode(this))
             .select("g")
             .selectAll(".tick")
             .select("line")
-            ["styles"](tickStyle);
+            .styles(tickStyle);
 
         select(ReactDOM.findDOMNode(this))
             .select("g")
@@ -374,7 +374,7 @@ export default class YAxis extends React.Component<YAxisProps> {
             select(ReactDOM.findDOMNode(this))
                 .select("g")
                 .append("line")
-                ["styles"](axisStyle)
+                .styles(axisStyle)
                 .attr("x1", 0)
                 .attr("y1", 0)
                 .attr("x2", 0)
@@ -477,7 +477,7 @@ export default class YAxis extends React.Component<YAxisProps> {
             .append("g")
             .attr("transform", `translate(${x},0)`)
             .attr("class", "yaxis")
-            ["styles"](valueStyle)
+            .styles(valueStyle)
             .call(axisGenerator.tickSize(tickSize))
             .append("text")
             .text(label || this.props.label)

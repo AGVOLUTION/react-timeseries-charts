@@ -605,9 +605,9 @@ export default class BandChart<T extends Key> extends React.Component<BandChartP
         // Use D3 to build an area generation function
         const areaGenerator = area()
             .curve(curves[this.props.interpolation])
-            .x(([x]) => x)
-            .y0(([x, y0]) => y0)
-            .y1(([x, y1]) => y1);
+            .x(d => d.x)
+            .y0(d => d.y0)
+            .y1(d => d.y1);
 
         const columns = this.series.columns();
 

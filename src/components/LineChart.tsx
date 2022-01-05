@@ -299,8 +299,8 @@ export default class LineChart<T extends Key> extends React.Component<LineChartP
         // D3 generates each path
         const path = line()
             .curve(curves[this.props.interpolation])
-            .x(([x]) => this.props.timeScale(x))
-            .y(([y]) => this.props.yScale(y))(data);
+            .x(d => this.props.timeScale(d.x))
+            .y(d => this.props.yScale(d.y))(data);
 
         return (
             <g key={key}>

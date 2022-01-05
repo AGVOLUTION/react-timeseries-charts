@@ -194,7 +194,7 @@ export default class TimeAxis extends React.Component<TimeAxisProps> {
             .append("g")
             .attr("class", "x axis")
             .style("stroke", "none")
-            ["styles"](valueStyle)
+            .styles(valueStyle)
             .call(axis.tickSize(tickSize));
 
         if (this.props.angled) {
@@ -202,7 +202,7 @@ export default class TimeAxis extends React.Component<TimeAxisProps> {
                 .select("g")
                 .selectAll(".tick")
                 .select("text")
-                ["styles"](valueStyle)
+                .styles(valueStyle)
                 .style("text-anchor", "end")
                 .attr("dx", "-1.2em")
                 .attr("dy", "0em")
@@ -214,13 +214,13 @@ export default class TimeAxis extends React.Component<TimeAxisProps> {
                 .select("g")
                 .selectAll(".tick")
                 .select("text")
-                ["styles"](valueStyle)
+                .styles(valueStyle)
         }
         select(ReactDOM.findDOMNode(this)) // eslint-disable-line
             .select("g")
             .selectAll(".tick")
             .select("line")
-            ["styles"](tickStyle)
+            .styles(tickStyle)
 
         select(ReactDOM.findDOMNode(this))
             .select("g")

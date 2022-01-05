@@ -1,6 +1,6 @@
 {
     "name": "@agv/react-timeseries-charts",
-    "version": "0.16.2-ts",
+    "version": "0.16.3-ts",
     "description": "Declarative timeseries charts",
     "keywords": [
         "d3",
@@ -55,7 +55,6 @@
         "underscore": "^1.8.3"
     },
     "devDependencies": {
-        "@types/d3": "^7.1.0",
         "@types/node": "^17.0.7",
         "@types/prop-types": "^15.7.4",
         "@types/react": "^17.0.38",

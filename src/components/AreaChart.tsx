@@ -373,9 +373,9 @@ export default class AreaChart<T extends Key> extends React.Component<AreaChartP
 
         const areaGenerator = area()
             .curve(curves[this.props.interpolation])
-            .x(([x0, y1]) => x0)
-            .y0(([x0, y0]) => y0)
-            .y1(([x0, y1]) => y1);
+            .x(d => d.x)
+            .y0(d => d.y0)
+            .y1(d => d.y1);
 
         // Use the area generation function with our stacked data
         // to get an SVG path
@@ -384,8 +384,8 @@ export default class AreaChart<T extends Key> extends React.Component<AreaChartP
         // Outline the top of the curve
         const lineGenerator = line()
             .curve(curves[this.props.interpolation])
-            .x(([x0, y1]) => x0)
-            .y(([x0, y1]) => y1);
+            .x(d => d.x)
+            .y(d => d.y);
         const outlinePath = lineGenerator(data);
 
         return (
