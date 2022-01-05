@@ -16,7 +16,7 @@ import PropTypes, { InferProps } from "prop-types";
  * current width of the this container. This is handy if you want to surround
  * a chart or other svg diagram and have this drive the chart width.
  */
-export default class Resizable extends React.Component<InferProps<typeof Resizable.propTypes>, any> {
+export default class Resizable extends React.Component<{}, any> {
     container: any;
     constructor(props) {
         super(props);
@@ -57,8 +57,4 @@ export default class Resizable extends React.Component<InferProps<typeof Resizab
             </div>
         );
     }
-    
-    static propTypes = {
-        children: PropTypes.node
-    };
 }

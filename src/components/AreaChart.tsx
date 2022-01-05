@@ -15,7 +15,7 @@ import { area, line } from "d3-shape";
 import merge from "merge";
 import React from "react";
 import PropTypes, { InferProps } from "prop-types";
-import { TimeSeries } from "pondjs";
+import { Key, TimeSeries } from "pondjs";
 
 import { scaleAsString } from "../js/util";
 import { Styler } from "../js/styler";
@@ -35,6 +35,140 @@ const defaultStyle: any = {
         muted: { fill: "steelblue", stroke: "none", opacity: 0.25 }
     }
 };
+
+type AreaChartProps<T extends Key> = {
+        /**
+         * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
+         */
+        series: TimeSeries<T>,
+
+        /**
+         * Reference to the axis which provides the vertical scale for ## drawing. e.g.
+         * specifying axis="trafficRate" would refer the y-scale to the YAxis of id="trafficRate".
+         */
+        axis: string, // eslint-disable-line
+
+        /**
+         * Show or hide this chart
+         */
+        visible?: boolean,
+
+        /**
+         * The series series columns mapped to stacking up and down.
+         * Has the format:
+         * ```
+         *  "columns": {
+         *      up: ["in", ...],
+         *      down: ["out", ...]
+         *  }
+         *  ```
+         * 
+         * NOTE : Columns can't have periods because periods 
+         * represent a path to deep data in the underlying events 
+         * (i.e. reference into nested data structures)
+         */
+        columns: {
+            up: string[],
+            down: string[]
+        },
+
+        /**
+         * Stack areas on top of each other
+         */
+        stack?: boolean,
+
+        /**
+         * The styles to apply to the underlying SVG lines. This is a mapping
+         * of column names to objects with style attributes, in the following
+         * format:
+         *
+         * ```
+         * const style: any = {
+         *     in: {
+         *         line: {
+         *             normal: {stroke: "steelblue", fill: "none", strokeWidth: 1},
+         *             highlighted: {stroke: "#5a98cb", fill: "none", strokeWidth: 1},
+         *             selected: {stroke: "steelblue", fill: "none", strokeWidth: 1},
+         *             muted: {stroke: "steelblue", fill: "none", opacity: 0.4, strokeWidth: 1}
+         *         },
+         *         area: {
+         *             normal: {fill: "steelblue", stroke: "none", opacity: 0.75},
+         *             highlighted: {fill: "#5a98cb", stroke: "none", opacity: 0.75},
+         *             selected: {fill: "steelblue", stroke: "none", opacity: 0.75},
+         *             muted: {fill: "steelblue", stroke: "none", opacity: 0.25}
+         *         }
+         *     },
+         *     out: {
+         *         ...
+         *     }
+         * };
+         *
+         * <AreaChart style={style} ... />
+         * ```
+         *
+         * Alternatively, you can pass in a Styler. For example:
+         *
+         * ```
+         * const upDownStyler = styler([
+         *     {key: "in", color: "#C8D5B8"},
+         *     {key: "out", color: "#9BB8D7"}
+         * ]);
+         *
+         * <AreaChart columns={["in", "out"]} style={upDownStyler} ... />
+         *
+         * ```
+         */
+        style: object | Function | Styler,
+
+        /**
+         * Any of D3's interpolation modes.
+         */
+        interpolation: D3interpolation
+
+        /**
+         * The currenly highlighted column
+         */
+        highlight: string,
+
+        /**
+         * Callback called when the highlight changes, i.e. hover event
+         */
+        onHighlightChange: Function,
+
+        /**
+         * The currenly selected column
+         */
+        selection: string,
+
+        /**
+         * Callback called when the selection changes, i.e. area is clicked
+         */
+        onSelectionChange: Function,
+
+        /**
+         * [Internal] The timeScale supplied by the surrounding ChartContainer
+         */
+        timeScale: Function,
+
+        /**
+         * [Internal] The yScale supplied by the associated YAxis
+         */
+        yScale: Function,
+
+        /**
+         * [Internal] The width supplied by the surrounding ChartContainer
+         */
+        width: number,
+
+        /**
+         * The determines how to handle bad/missing values in the supplied
+         * TimeSeries. A missing value can be null or NaN. If breakArea
+         * is set to true then the area chart will be broken on either side of
+         * the bad value(s). If breakArea is false (the default) bad values
+         * are simply removed and the adjoining points are connected.
+         */
+        breakArea: boolean
+    }
 
 /**
  * The `<AreaChart>` component is able to display single or multiple stacked
@@ -88,7 +222,7 @@ const defaultStyle: any = {
  * in the underlying events (i.e. reference into nested data structures)
  * 
  */
-export default class AreaChart extends React.Component<InferProps<typeof AreaChart.propTypes>> {
+export default class AreaChart<T extends Key> extends React.Component<AreaChartProps<T>> {
     shouldComponentUpdate(nextProps) {
         const newSeries = nextProps.series;
         const oldSeries = this.props.series;
@@ -154,9 +288,9 @@ export default class AreaChart extends React.Component<InferProps<typeof AreaCha
         if (this.props.style) {
             if (this.props.style instanceof Styler) {
                 style = this.props.style.areaChartStyle()[column];
-            } else if (_.isFunction(this.props.style)) {
+            } else if (typeof this.props.style === "function") {
                 style = (this.props.style as Function)(column);
-            } else if (_.isObject(this.props.style)) {
+            } else if (typeof this.props.style === "object") {
                 style = this.props.style ? this.props.style[column] : defaultStyle;
             }
         }
@@ -239,9 +373,9 @@ export default class AreaChart extends React.Component<InferProps<typeof AreaCha
 
         const areaGenerator = area()
             .curve(curves[this.props.interpolation])
-            .x(d => d.x0)
-            .y0(d => d.y0)
-            .y1(d => d.y1);
+            .x(([x0, y1]) => x0)
+            .y0(([x0, y0]) => y0)
+            .y1(([x0, y1]) => y1);
 
         // Use the area generation function with our stacked data
         // to get an SVG path
@@ -250,8 +384,8 @@ export default class AreaChart extends React.Component<InferProps<typeof AreaCha
         // Outline the top of the curve
         const lineGenerator = line()
             .curve(curves[this.props.interpolation])
-            .x(d => d.x0)
-            .y(d => d.y1);
+            .x(([x0, y1]) => x0)
+            .y(([x0, y1]) => y1);
         const outlinePath = lineGenerator(data);
 
         return (
@@ -372,157 +506,6 @@ export default class AreaChart extends React.Component<InferProps<typeof AreaCha
 
     render() {
         return <g>{this.renderAreas()}</g>;
-    }
-    
-    static propTypes = {
-        /**
-         * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
-         */
-        // series: PropTypes.instanceOf(TimeSeries as any).isRequired,
-        series: PropTypes.any.isRequired,
-
-        /**
-         * Reference to the axis which provides the vertical scale for ## drawing. e.g.
-         * specifying axis="trafficRate" would refer the y-scale to the YAxis of id="trafficRate".
-         */
-        axis: PropTypes.string.isRequired, // eslint-disable-line
-
-        /**
-         * Show or hide this chart
-         */
-        visible: PropTypes.bool,
-
-        /**
-         * The series series columns mapped to stacking up and down.
-         * Has the format:
-         * ```
-         *  "columns": {
-         *      up: ["in", ...],
-         *      down: ["out", ...]
-         *  }
-         *  ```
-         * 
-         * NOTE : Columns can't have periods because periods 
-         * represent a path to deep data in the underlying events 
-         * (i.e. reference into nested data structures)
-         */
-        columns: PropTypes.shape({
-            up: PropTypes.arrayOf(PropTypes.string),
-            down: PropTypes.arrayOf(PropTypes.string)
-        }),
-
-        /**
-         * Stack areas on top of each other
-         */
-        stack: PropTypes.bool,
-
-        /**
-         * The styles to apply to the underlying SVG lines. This is a mapping
-         * of column names to objects with style attributes, in the following
-         * format:
-         *
-         * ```
-         * const style: any = {
-         *     in: {
-         *         line: {
-         *             normal: {stroke: "steelblue", fill: "none", strokeWidth: 1},
-         *             highlighted: {stroke: "#5a98cb", fill: "none", strokeWidth: 1},
-         *             selected: {stroke: "steelblue", fill: "none", strokeWidth: 1},
-         *             muted: {stroke: "steelblue", fill: "none", opacity: 0.4, strokeWidth: 1}
-         *         },
-         *         area: {
-         *             normal: {fill: "steelblue", stroke: "none", opacity: 0.75},
-         *             highlighted: {fill: "#5a98cb", stroke: "none", opacity: 0.75},
-         *             selected: {fill: "steelblue", stroke: "none", opacity: 0.75},
-         *             muted: {fill: "steelblue", stroke: "none", opacity: 0.25}
-         *         }
-         *     },
-         *     out: {
-         *         ...
-         *     }
-         * };
-         *
-         * <AreaChart style={style} ... />
-         * ```
-         *
-         * Alternatively, you can pass in a Styler. For example:
-         *
-         * ```
-         * const upDownStyler = styler([
-         *     {key: "in", color: "#C8D5B8"},
-         *     {key: "out", color: "#9BB8D7"}
-         * ]);
-         *
-         * <AreaChart columns={["in", "out"]} style={upDownStyler} ... />
-         *
-         * ```
-         */
-        style: PropTypes.oneOfType([PropTypes.object, PropTypes.func, PropTypes.instanceOf(Styler)]),
-
-        /**
-         * Any of D3's interpolation modes.
-         */
-        interpolation: PropTypes.oneOf([
-            "curveBasis",
-            "curveBasisOpen",
-            "curveBundle",
-            "curveCardinal",
-            "curveCardinalOpen",
-            "curveCatmullRom",
-            "curveCatmullRomOpen",
-            "curveLinear",
-            "curveMonotoneX",
-            "curveMonotoneY",
-            "curveNatural",
-            "curveRadial",
-            "curveStep",
-            "curveStepAfter",
-            "curveStepBefore"
-        ]),
-
-        /**
-         * The currenly highlighted column
-         */
-        highlight: PropTypes.string,
-
-        /**
-         * Callback called when the highlight changes, i.e. hover event
-         */
-        onHighlightChange: PropTypes.func,
-
-        /**
-         * The currenly selected column
-         */
-        selection: PropTypes.string,
-
-        /**
-         * Callback called when the selection changes, i.e. area is clicked
-         */
-        onSelectionChange: PropTypes.func,
-
-        /**
-         * [Internal] The timeScale supplied by the surrounding ChartContainer
-         */
-        timeScale: PropTypes.func,
-
-        /**
-         * [Internal] The yScale supplied by the associated YAxis
-         */
-        yScale: PropTypes.func,
-
-        /**
-         * [Internal] The width supplied by the surrounding ChartContainer
-         */
-        width: PropTypes.number,
-
-        /**
-         * The determines how to handle bad/missing values in the supplied
-         * TimeSeries. A missing value can be null or NaN. If breakArea
-         * is set to true then the area chart will be broken on either side of
-         * the bad value(s). If breakArea is false (the default) bad values
-         * are simply removed and the adjoining points are connected.
-         */
-        breakArea: PropTypes.bool
     }
     
     static defaultProps = {

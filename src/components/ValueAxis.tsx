@@ -25,7 +25,33 @@ import PropTypes from "prop-types";
  * end of the row and supply it with the current value. See the cycling example
  * for how that would all work.
  */
-const ValueAxis = ({ width, height, value, detail }) => {
+const ValueAxis = ({ width, height, value, detail }: {
+    /**
+     * Show or hide this
+     */
+    visible?: boolean,
+
+    /**
+     * If values are numbers, use this format string
+     */
+    value: string | number
+
+    /**
+     * Use this to show what units are being used. It will appear below
+     * the value.
+     */
+    detail: string,
+
+    /**
+     * The width of the axis
+     */
+    width: number,
+
+    /**
+     * [Internal] The height of the axis
+     */
+    height: number
+}) => {
     const labelStyle: any = {
         fill: "#666",
         fontSize: 20,
@@ -60,34 +86,6 @@ const ValueAxis = ({ width, height, value, detail }) => {
             </text>
         </g>
     );
-};
-
-ValueAxis.propTypes = {
-    /**
-     * Show or hide this
-     */
-    visible: PropTypes.bool,
-
-    /**
-     * If values are numbers, use this format string
-     */
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-
-    /**
-     * Use this to show what units are being used. It will appear below
-     * the value.
-     */
-    detail: PropTypes.string,
-
-    /**
-     * The width of the axis
-     */
-    width: PropTypes.number,
-
-    /**
-     * [Internal] The height of the axis
-     */
-    height: PropTypes.number
 };
 
 ValueAxis.defaultProps = {

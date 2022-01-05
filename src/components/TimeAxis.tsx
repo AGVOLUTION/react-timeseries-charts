@@ -44,12 +44,28 @@ const defaultStyle: any = {
     }
 };
 
+type TimeAxisProps = {
+        scale: Function,
+        showGrid?: boolean,
+        angled?: boolean,
+        gridHeight: number,
+        format: string | Function,
+        utc?: boolean,
+        style: {
+            label?: object, // eslint-disable-line
+            values: object, // eslint-disable-line
+            axis: object, // eslint-disable-line
+            ticks: any // eslint-disable-line
+        },
+        tickCount: number
+    }
+
 /**
  * Renders a horizontal time axis. This is used internally by the ChartContainer
  * as a result of you specifying the timerange for the chart. Please see the API
  * docs for ChartContainer for more information.
  */
-export default class TimeAxis extends React.Component<InferProps<typeof TimeAxis.propTypes>> {
+export default class TimeAxis extends React.Component<TimeAxisProps> {
     componentDidMount() {
         const { scale, format, showGrid, gridHeight } = this.props;
         this.renderTimeAxis(scale, format, showGrid, gridHeight);
@@ -119,12 +135,12 @@ export default class TimeAxis extends React.Component<InferProps<typeof TimeAxis
                     .ticks(tickCount)
                     .tickFormat(d => (moment.duration(+d) as any).format())
                     .tickSizeOuter(0);
-            } else if (_.isString(format)) {
+            } else if (typeof format === "string") {
                 axis = axisBottom(scale)
                     .ticks(tickCount)
                     .tickFormat(timeFormat(format))
                     .tickSizeOuter(0);
-            } else if (_.isFunction(format)) {
+            } else if (typeof format === "function") {
                 axis = axisBottom(scale)
                     .ticks(tickCount)
                     .tickFormat(format)
@@ -154,11 +170,11 @@ export default class TimeAxis extends React.Component<InferProps<typeof TimeAxis
                 axis = axisBottom(scale)
                     .tickFormat(d => (moment.duration(+d) as any).format())
                     .tickSizeOuter(0);
-            } else if (_.isString(format)) {
+            } else if (typeof format === "string") {
                 axis = axisBottom(scale)
                     .tickFormat(timeFormat(format))
                     .tickSizeOuter(0);
-            } else if (_.isFunction(format)) {
+            } else if (typeof format === "function") {
                 axis = axisBottom(scale)
                     .tickFormat(format)
                     .tickSizeOuter(0);
@@ -178,7 +194,7 @@ export default class TimeAxis extends React.Component<InferProps<typeof TimeAxis
             .append("g")
             .attr("class", "x axis")
             .style("stroke", "none")
-            .styles(valueStyle)
+            ["styles"](valueStyle)
             .call(axis.tickSize(tickSize));
 
         if (this.props.angled) {
@@ -186,7 +202,7 @@ export default class TimeAxis extends React.Component<InferProps<typeof TimeAxis
                 .select("g")
                 .selectAll(".tick")
                 .select("text")
-                .styles(valueStyle)
+                ["styles"](valueStyle)
                 .style("text-anchor", "end")
                 .attr("dx", "-1.2em")
                 .attr("dy", "0em")
@@ -198,13 +214,13 @@ export default class TimeAxis extends React.Component<InferProps<typeof TimeAxis
                 .select("g")
                 .selectAll(".tick")
                 .select("text")
-                .styles(valueStyle);
+                ["styles"](valueStyle)
         }
         select(ReactDOM.findDOMNode(this)) // eslint-disable-line
             .select("g")
             .selectAll(".tick")
             .select("line")
-            .styles(tickStyle);
+            ["styles"](tickStyle)
 
         select(ReactDOM.findDOMNode(this))
             .select("g")
@@ -222,19 +238,4 @@ export default class TimeAxis extends React.Component<InferProps<typeof TimeAxis
         angled: false
     };
 
-    static propTypes = {
-        scale: PropTypes.func.isRequired,
-        showGrid: PropTypes.bool,
-        angled: PropTypes.bool,
-        gridHeight: PropTypes.number,
-        format: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-        utc: PropTypes.bool,
-        style: PropTypes.shape({
-            label: PropTypes.object, // eslint-disable-line
-            values: PropTypes.object, // eslint-disable-line
-            axis: PropTypes.object, // eslint-disable-line
-            ticks: PropTypes.any // eslint-disable-line
-        }),
-        tickCount: PropTypes.number
-    }
 }

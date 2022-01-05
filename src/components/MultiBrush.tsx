@@ -14,11 +14,77 @@ import PropTypes, { InferProps } from "prop-types";
 import { TimeRange } from "pondjs";
 
 import { getElementOffset } from "../js/util";
+import { ScaleTime } from "d3-scale";
+
+type MultiBrushProps = {
+        /**
+         * The timeranges for the brushes. Typically you would maintain this
+         * as state on the surrounding page, since it would likely control
+         * another page element, such as the range of the main chart. See
+         * also `onTimeRangeChanged()` for receiving notification of the
+         * brush range being changed by the user.
+         *
+         * Takes an array of Pond TimeRange object.
+         */
+        timeRanges: TimeRange[],
+
+        /**
+         * The brush is rendered as an SVG rect. You can specify the style
+         * of this rect using this prop. The brush style is a function that you
+         * provide. It will be called with the index of the TimeRange, corresponding
+         * to those in the `timeRanges` prop.
+         */
+        style: Function, //eslint-disable-line
+
+        /**
+         * The size of the invisible side handles. Defaults to 6 pixels.
+         */
+        handleSize: number,
+
+        /**
+         * If this prop is false, you will only be able to draw a new brush if the last position of the timeRanges
+         * array is equal to null, otherwise it will allow the free drawing and the index passed to onTimeRangeChanged
+         * will the equal to the length of the timeRanges array
+         */
+        allowFreeDrawing?: boolean,
+
+        /**
+         * A callback which will be called if the brush range is changed by
+         * the user. It is called with a Pond TimeRange object and the index position of
+         * the brush in the timeRanges prop.
+         */
+        onTimeRangeChanged: Function,
+
+        /**
+         * when user stop drawing or dragging box
+         */
+        onUserMouseUp: Function,
+
+        /**
+         * When the user clicks one of the TimeRanges
+         */
+        onTimeRangeClicked: Function,
+
+        /**
+         * [Internal] The timeScale supplied by the surrounding ChartContainer
+         */
+        timeScale: ScaleTime<any, any>,
+
+        /**
+         * [Internal] The width supplied by the surrounding ChartContainer
+         */
+        width: number,
+
+        /**
+         * [Internal] The height supplied by the surrounding ChartContainer
+         */
+        height: number
+    };
 
 /**
  * Renders a brush with the range defined in the prop `timeRange`.
  */
-export default class MultiBrush extends React.Component<InferProps<typeof MultiBrush.propTypes>, any> {
+export default class MultiBrush extends React.Component<MultiBrushProps, any> {
     overlay: SVGRectElement;
     constructor(props) {
         super(props);
@@ -183,10 +249,10 @@ export default class MultiBrush extends React.Component<InferProps<typeof MultiB
                 // Constrain
                 let startOffsetConstraint = timeOffset;
                 let endOffsetConstrain = timeOffset;
-                if (tb - timeOffset < viewport.begin()) {
+                if (tb - timeOffset < viewport.begin().valueOf()) {
                     startOffsetConstraint = tb - viewport.begin().getTime();
                 }
-                if (te - timeOffset > viewport.end()) {
+                if (te - timeOffset > viewport.end().valueOf()) {
                     endOffsetConstrain = te - viewport.end().getTime();
                 }
 
@@ -389,72 +455,6 @@ export default class MultiBrush extends React.Component<InferProps<typeof MultiB
             </g>
         );
     }
-
-    static propTypes = {
-        /**
-         * The timeranges for the brushes. Typically you would maintain this
-         * as state on the surrounding page, since it would likely control
-         * another page element, such as the range of the main chart. See
-         * also `onTimeRangeChanged()` for receiving notification of the
-         * brush range being changed by the user.
-         *
-         * Takes an array of Pond TimeRange object.
-         */
-        // timeRanges: PropTypes.arrayOf(PropTypes.instanceOf(TimeRange)),
-        timeRanges: PropTypes.any,
-
-        /**
-         * The brush is rendered as an SVG rect. You can specify the style
-         * of this rect using this prop. The brush style is a function that you
-         * provide. It will be called with the index of the TimeRange, corresponding
-         * to those in the `timeRanges` prop.
-         */
-        style: PropTypes.any, //eslint-disable-line
-
-        /**
-         * The size of the invisible side handles. Defaults to 6 pixels.
-         */
-        handleSize: PropTypes.number,
-
-        /**
-         * If this prop is false, you will only be able to draw a new brush if the last position of the timeRanges
-         * array is equal to null, otherwise it will allow the free drawing and the index passed to onTimeRangeChanged
-         * will the equal to the length of the timeRanges array
-         */
-        allowFreeDrawing: PropTypes.bool,
-
-        /**
-         * A callback which will be called if the brush range is changed by
-         * the user. It is called with a Pond TimeRange object and the index position of
-         * the brush in the timeRanges prop.
-         */
-        onTimeRangeChanged: PropTypes.func,
-
-        /**
-         * when user stop drawing or dragging box
-         */
-        onUserMouseUp: PropTypes.func,
-
-        /**
-         * When the user clicks one of the TimeRanges
-         */
-        onTimeRangeClicked: PropTypes.func,
-
-        /**
-         * [Internal] The timeScale supplied by the surrounding ChartContainer
-         */
-        timeScale: PropTypes.any,
-
-        /**
-         * [Internal] The width supplied by the surrounding ChartContainer
-         */
-        width: PropTypes.number,
-
-        /**
-         * [Internal] The height supplied by the surrounding ChartContainer
-         */
-        height: PropTypes.number
-    };
 
     static defaultProps = {
         handleSize: 6,

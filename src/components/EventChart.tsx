@@ -12,7 +12,80 @@ import _ from "underscore";
 import merge from "merge";
 import React from "react";
 import PropTypes, { InferProps } from "prop-types";
-import { TimeSeries, Event } from "pondjs";
+import { TimeSeries, Event, Key } from "pondjs";
+
+type EventChartProps<T extends Key> = {
+        /**
+         * Show or hide this chart
+         */
+        visible?: boolean,
+
+        /**
+         * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
+         */
+        series: TimeSeries<T>,
+
+        /**
+         * Set hover label text
+         * When label is function callback it will be called with current event.
+         */
+        label: string | Function,
+
+        /**
+         * The height in pixels for the event bar
+         */
+        size: number,
+
+        /**
+         * The distance in pixels to inset the event bar from its actual timerange
+         */
+        spacing: number,
+
+        /**
+         * Marker width on hover
+         */
+        hoverMarkerWidth: number,
+
+        /**
+         * Hover text offset position X
+         */
+        textOffsetX: number,
+
+        /**
+         * Hover text offset position Y
+         */
+        textOffsetY: number,
+
+        /**
+         * A function that should return the style of the event box
+         */
+        style: Function,
+
+        /**
+         * Event selection on click. Will be called with selected event.
+         */
+        onSelectionChange: Function,
+
+        /**
+         * Mouse leave at end of hover event
+         */
+        onMouseLeave: Function,
+
+        /**
+         * Mouse over event callback
+         */
+        onMouseOver: Function,
+
+        /**
+         * [Internal] The timeScale supplied by the surrounding ChartContainer
+         */
+        timeScale: Function,
+
+        /**
+         * [Internal] The width supplied by the surrounding ChartContainer
+         */
+        width: number
+    }
 
 /**
  * Renders an event view that shows the supplied set of events along a time axis.
@@ -20,7 +93,7 @@ import { TimeSeries, Event } from "pondjs";
  * That series may contain regular TimeEvents, TimeRangeEvents
  * or IndexedEvents.
  */
-export default class EventChart extends React.Component<InferProps<typeof EventChart.propTypes>, any> {
+export default class EventChart<T extends Key> extends React.Component<EventChartProps<T>, any> {
     constructor(props) {
         super(props);
         this.state = {
@@ -66,7 +139,7 @@ export default class EventChart extends React.Component<InferProps<typeof EventC
 
         // Create and array of markers, one for each event
         let i = 0;
-        for (const event of series.events()) {
+        for (const event of series.eventList()) {
             const begin = event.begin();
             const end = event.end();
             const beginPos = scale(begin) >= 0 ? scale(begin) : 0;
@@ -91,9 +164,9 @@ export default class EventChart extends React.Component<InferProps<typeof EventC
 
             let label = "";
             if (this.props.label) {
-                if (_.isString(this.props.label)) {
+                if (typeof this.props.label === "string") {
                     label = this.props.label;
-                } else if (_.isFunction(this.props.label)) {
+                } else if (typeof this.props.label === "function") {
                     label = this.props.label(event);
                 }
             }
@@ -166,80 +239,6 @@ export default class EventChart extends React.Component<InferProps<typeof EventC
         textOffsetX: 0,
         textOffsetY: 0,
         hoverMarkerWidth: 5
-    }
-
-    static propTypes = {
-        /**
-         * Show or hide this chart
-         */
-        visible: PropTypes.bool,
-
-        /**
-         * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
-         */
-        // series: PropTypes.instanceOf(TimeSeries).isRequired,
-        series: PropTypes.any.isRequired,
-
-        /**
-         * Set hover label text
-         * When label is function callback it will be called with current event.
-         */
-        label: PropTypes.any,
-
-        /**
-         * The height in pixels for the event bar
-         */
-        size: PropTypes.number,
-
-        /**
-         * The distance in pixels to inset the event bar from its actual timerange
-         */
-        spacing: PropTypes.number,
-
-        /**
-         * Marker width on hover
-         */
-        hoverMarkerWidth: PropTypes.number,
-
-        /**
-         * Hover text offset position X
-         */
-        textOffsetX: PropTypes.number,
-
-        /**
-         * Hover text offset position Y
-         */
-        textOffsetY: PropTypes.number,
-
-        /**
-         * A function that should return the style of the event box
-         */
-        style: PropTypes.func,
-
-        /**
-         * Event selection on click. Will be called with selected event.
-         */
-        onSelectionChange: PropTypes.func,
-
-        /**
-         * Mouse leave at end of hover event
-         */
-        onMouseLeave: PropTypes.func,
-
-        /**
-         * Mouse over event callback
-         */
-        onMouseOver: PropTypes.func,
-
-        /**
-         * [Internal] The timeScale supplied by the surrounding ChartContainer
-         */
-        timeScale: PropTypes.func,
-
-        /**
-         * [Internal] The width supplied by the surrounding ChartContainer
-         */
-        width: PropTypes.number
     }
 
 }

@@ -14,11 +14,57 @@ import PropTypes, { InferProps } from "prop-types";
 import { TimeRange } from "pondjs";
 
 import { getElementOffset } from "../js/util";
+import { ScaleTime } from "d3-scale";
+
+type BrushProps = {
+        /**
+     * The timerange for the brush. Typically you would maintain this
+     * as state on the surrounding page, since it would likely control
+     * another page element, such as the range of the main chart. See
+     * also `onTimeRangeChanged()` for receiving notification of the
+     * brush range being changed by the user.
+     *
+     * Takes a Pond TimeRange object.
+     */
+        // timeRange: TimeRange,
+        timeRange: TimeRange,
+        /**
+     * The brush is rendered as an SVG rect. You can specify the style
+     * of this rect using this prop.
+     */
+        style: object, //eslint-disable-line
+        /**
+     * The size of the invisible side handles. Defaults to 6 pixels.
+     */
+        handleSize: number,
+        allowSelectionClear?: boolean,
+        /**
+     * A callback which will be called if the brush range is changed by
+     * the user. It is called with a Pond TimeRange object. Note that if
+     * `allowSelectionClear` is set to true, then this can also be called
+     * when the user performs a simple click outside the brush area. In
+     * this case it will be called with null as the TimeRange. You can
+     * use this to reset the selection, perhaps to some initial range.
+     */
+        onTimeRangeChanged: Function,
+        /**
+     * [Internal] The timeScale supplied by the surrounding ChartContainer
+     */
+        timeScale: ScaleTime<any, any>,
+        /**
+     * [Internal] The width supplied by the surrounding ChartContainer
+     */
+        width: number,
+        /**
+     * [Internal] The height supplied by the surrounding ChartContainer
+     */
+        height: number
+    }
 
 /**
  * Renders a brush with the range defined in the prop `timeRange`.
  */
-export default class Brush extends React.Component<InferProps<typeof Brush.propTypes>, any> {
+export default class Brush extends React.Component<BrushProps, any> {
     overlay: any;
     constructor(props) {
         super(props);
@@ -165,10 +211,10 @@ export default class Brush extends React.Component<InferProps<typeof Brush.propT
                 // Constrain
                 let startOffsetConstraint = timeOffset;
                 let endOffsetConstrain = timeOffset;
-                if (tb - timeOffset < viewport.begin()) {
+                if (tb - timeOffset < viewport.begin().valueOf()) {
                     startOffsetConstraint = tb - viewport.begin().getTime();
                 }
-                if (te - timeOffset > viewport.end()) {
+                if (te - timeOffset > viewport.end().valueOf()) {
                     endOffsetConstrain = te - viewport.end().getTime();
                 }
 
@@ -264,7 +310,7 @@ export default class Brush extends React.Component<InferProps<typeof Brush.propT
         const brushStyle = merge(true, brushDefaultStyle, style);
 
         if (!this.viewport().disjoint(timeRange)) {
-            const range = timeRange.intersection(this.viewport());
+            const range = timeRange.intersection(this.viewport()) as TimeRange;
             const begin = range.begin();
             const end = range.end();
             const [x, y] = [timeScale(begin), 0];
@@ -304,8 +350,8 @@ export default class Brush extends React.Component<InferProps<typeof Brush.propT
         };
 
         if (!this.viewport().disjoint(timeRange)) {
-            const range = timeRange.intersection(this.viewport());
-            const [begin, end] = range.toJSON();
+            const range = timeRange.intersection(this.viewport()) as TimeRange;
+            const [begin, end] = range.toJSON() as [Date, Date];
             const [x, y] = [timeScale(begin), 0];
             const endPos = timeScale(end);
 
@@ -354,51 +400,6 @@ export default class Brush extends React.Component<InferProps<typeof Brush.propT
                 {this.renderHandles()}
             </g>
         );
-    }
-    
-    static propTypes = {
-        /**
-     * The timerange for the brush. Typically you would maintain this
-     * as state on the surrounding page, since it would likely control
-     * another page element, such as the range of the main chart. See
-     * also `onTimeRangeChanged()` for receiving notification of the
-     * brush range being changed by the user.
-     *
-     * Takes a Pond TimeRange object.
-     */
-        // timeRange: PropTypes.instanceOf(TimeRange),
-        timeRange: PropTypes.any,
-        /**
-     * The brush is rendered as an SVG rect. You can specify the style
-     * of this rect using this prop.
-     */
-        style: PropTypes.object, //eslint-disable-line
-        /**
-     * The size of the invisible side handles. Defaults to 6 pixels.
-     */
-        handleSize: PropTypes.number,
-        allowSelectionClear: PropTypes.bool,
-        /**
-     * A callback which will be called if the brush range is changed by
-     * the user. It is called with a Pond TimeRange object. Note that if
-     * `allowSelectionClear` is set to true, then this can also be called
-     * when the user performs a simple click outside the brush area. In
-     * this case it will be called with null as the TimeRange. You can
-     * use this to reset the selection, perhaps to some initial range.
-     */
-        onTimeRangeChanged: PropTypes.func,
-        /**
-     * [Internal] The timeScale supplied by the surrounding ChartContainer
-     */
-        timeScale: PropTypes.any,
-        /**
-     * [Internal] The width supplied by the surrounding ChartContainer
-     */
-        width: PropTypes.number,
-        /**
-     * [Internal] The height supplied by the surrounding ChartContainer
-     */
-        height: PropTypes.number
     }
     
     static defaultProps = {

@@ -52,7 +52,33 @@ function mergeStyles(style, isCentered) {
  *      +----------------+
  */
 
-const Label = ({ label, style, align, width, height }) => {
+const Label = ({ label, style, align, width, height }: {
+    /**
+     * Where to position the label, either "left" or "center" within the box
+     */
+    align: "center" | "left",
+
+    /**
+     * The label to render
+     */
+    label: string,
+
+    /**
+     * The style of the label. This is the inline CSS applied directly
+     * to the label box
+     */
+    style: object, // eslint-disable-line
+
+    /**
+     * The width of the rectangle to render into
+     */
+    width: number,
+
+    /**
+     * The height of the rectangle to render into
+     */
+    height: number
+}) => {
     const { boxStyle, labelStyle } = mergeStyles(style, align === "center");
 
     const posx = align === "center" ? parseInt(width / 2 as any, 10) : 10;
@@ -80,32 +106,5 @@ Label.defaultProps = {
     pointerEvents: "none"
 };
 
-Label.propTypes = {
-    /**
-     * Where to position the label, either "left" or "center" within the box
-     */
-    align: PropTypes.oneOf(["center", "left"]),
-
-    /**
-     * The label to render
-     */
-    label: PropTypes.string.isRequired,
-
-    /**
-     * The style of the label. This is the inline CSS applied directly
-     * to the label box
-     */
-    style: PropTypes.object, // eslint-disable-line
-
-    /**
-     * The width of the rectangle to render into
-     */
-    width: PropTypes.number,
-
-    /**
-     * The height of the rectangle to render into
-     */
-    height: PropTypes.number
-};
 
 export default Label;

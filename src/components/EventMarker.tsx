@@ -12,13 +12,13 @@ import _ from "underscore";
 import React from "react";
 import PropTypes, { InferProps } from "prop-types";
 import merge from "merge";
-import { TimeEvent, TimeRangeEvent, IndexedEvent, Index, TimeRange } from "pondjs";
+import { timeEvent, timeRangeEvent, indexedEvent, Index, TimeRange, Event, Time } from "pondjs";
 import { timeFormat } from "d3-time-format";
 
 import Label from "./Label";
 import ValueList from "./ValueList";
 
-const EventTime = ({ time, format = "%m/%d/%y %X" }) => {
+const EventTime = ({ time, format = "%m/%d/%y %X" }: { time: Date, format: string | Function}) => {
     const textStyle: any = {
         fontSize: 11,
         textAnchor: "left",
@@ -27,7 +27,7 @@ const EventTime = ({ time, format = "%m/%d/%y %X" }) => {
     };
 
     let text;
-    if (_.isFunction(format)) {
+    if (typeof format === "function") {
         text = (format as unknown as Function)(time);
     } else {
         const fmt = timeFormat(format);
@@ -41,16 +41,11 @@ const EventTime = ({ time, format = "%m/%d/%y %X" }) => {
     );
 };
 
-EventTime.propTypes = {
-    time: PropTypes.instanceOf(Date),
-    format: PropTypes.any
-};
-
 EventTime.defaultProps = {
     infoTimeFormat: "%m/%d/%y %X"
 };
 
-const EventTimeRange = ({ timerange, format = "%m/%d/%y %X" }) => {
+const EventTimeRange = ({ timerange, format = "%m/%d/%y %X" }: { timerange: TimeRange, format: string | Function }) => {
     const textStyle: any = {
         fontSize: 11,
         textAnchor: "left",
@@ -63,7 +58,7 @@ const EventTimeRange = ({ timerange, format = "%m/%d/%y %X" }) => {
     let beginText;
     let endText;
 
-    if (_.isFunction(format)) {
+    if (typeof format === "function") {
         beginText = (format as unknown as Function)(d1);
         endText = (format as unknown as Function)(d2);
     } else {
@@ -80,7 +75,7 @@ const EventTimeRange = ({ timerange, format = "%m/%d/%y %X" }) => {
 };
 
 EventTimeRange.propTypes = {
-    timerange: PropTypes.instanceOf(TimeRange),
+    timerange: TimeRange,
     format: PropTypes.any
 };
 
@@ -97,9 +92,9 @@ const EventIndex = ({ index, format }) => {
     };
 
     let text;
-    if (_.isFunction(format)) {
+    if (typeof format === "function") {
         text = format(index);
-    } else if (_.isString(format)) {
+    } else if (typeof format === "string") {
         const fmt = timeFormat(format);
         text = fmt(index.begin());
     } else {
@@ -114,9 +109,123 @@ const EventIndex = ({ index, format }) => {
 };
 
 EventIndex.propTypes = {
-    index: PropTypes.instanceOf(Index),
+    index: Index,
     format: PropTypes.any
 };
+
+type EventMarkerProps = Partial<{
+        type: "point" | "flag",
+
+        /**
+         * What [Pond Event](https://esnet-pondjs.appspot.com/#/event) to mark
+         */
+        event: Event,
+
+        /**
+         * Which column in the Event to use
+         *
+         * NOTE : Columns can't have periods because periods
+         * represent a path to deep data in the underlying events
+         * (i.e. reference into nested data structures)
+         */
+        column: string,
+
+        /**
+         * The values to show in the info box. This is either an array of
+         * objects, with each object specifying the label and value
+         * to be shown in the info box, or a simple string label. If this
+         * prop is not supplied, no infoBox will be displayed.
+         */
+        info: string | {
+            label: string, // eslint-disable-line
+            value: string // eslint-disable-line
+        }[],
+
+        /**
+         * The style of the info box itself. Typically you'd want to
+         * specify a fill color, and stroke color/width here.
+         */
+        infoStyle: object,
+
+        /**
+         * The width of the info box
+         */
+        infoWidth: number,
+
+        /**
+         * The height of the info box
+         */
+        infoHeight: number,
+
+        /**
+         * Alter the format of the timestamp shown on the info box.
+         * This may be either a function or a string. If you provide a function
+         * that will be passed an Index and should return a string. For example:
+         * ```
+         *     index => moment(index.begin()).format("Do MMM 'YY")
+         * ```
+         * Alternatively you can pass in a d3 format string. That will be applied
+         * to the begin time of the Index range.
+         */
+        infoTimeFormat: string | Function,
+
+        /**
+         * Show a label to the left or right of the marker
+         */
+        markerLabelAlign: "left" | "right" | "top" | "bottom",
+        markerLabel: string,
+        markerLabelStyle: object,
+
+        marker: string,
+        /**
+         * The radius of the dot at the end of the marker
+         */
+        markerRadius: number,
+
+        /**
+         * The style of the event marker dot
+         */
+        markerStyle: object,
+
+        /**
+         * The y value is calculated by the column and event, but if
+         * this prop is provided this will be used instead.
+         */
+        yValueFunc: Function,
+
+        /**
+         * Offset the marker position in the x direction.
+         */
+        offsetX: number,
+
+        /**
+         * Offset the marker position in the y direction
+         */
+        offsetY: number,
+
+        /**
+         * The vertical offset in pixels of the EventMarker info box from the
+         * top of the chart. The default is 20.
+         */
+        infoOffsetY: number,
+
+        /**
+         * [Internal] The timeScale supplied by the surrounding ChartContainer
+         */
+        timeScale: Function,
+
+        /**
+         * [Internal] The yScale supplied by the associated YAxis
+         */
+        yScale: Function,
+
+        /**
+         * [Internal] The width supplied by the surrounding ChartContainer
+         */
+        width: number,
+
+        stemStyle: object,
+    }>;
 
 /**
  * Renders a marker at a specific event on the chart.
@@ -148,13 +257,13 @@ EventIndex.propTypes = {
  * the center of the timerange represented by that event. You can, however,
  * override either the x or y position by a number of pixels.
  */
-export default class EventMarker extends React.Component<InferProps<typeof EventMarker.propTypes>> {
-    renderTime(event) {
-        if (event instanceof TimeEvent) {
+export default class EventMarker extends React.Component<EventMarkerProps> {
+    renderTime(event: Event) {
+        if (event.getKey() instanceof Time) {
             return <EventTime time={event.timestamp()} format={this.props.infoTimeFormat} />;
-        } else if (event instanceof IndexedEvent) {
+        } else if (event.getKey() instanceof Index) {
             return <EventIndex index={event.index()} format={this.props.infoTimeFormat} />;
-        } else if (event instanceof TimeRangeEvent) {
+        } else if (event.getKey() instanceof TimeRange) {
             return (
                 <EventTimeRange timerange={event.timerange()} format={this.props.infoTimeFormat} />
             );
@@ -162,9 +271,9 @@ export default class EventMarker extends React.Component<InferProps<typeof Event
         return <g />;
     }
 
-    renderMarker(event, column, info) {
+    renderMarker(event: Event, column, info) {
         let t;
-        if (event instanceof TimeEvent) {
+        if (event.getKey() instanceof Time) {
             t = event.timestamp();
         } else {
             t = new Date(
@@ -204,7 +313,7 @@ export default class EventMarker extends React.Component<InferProps<typeof Event
         let label;
 
         if (info) {
-            if (_.isString(this.props.info)) {
+            if (typeof this.props.info === "string") {
                 infoBox = <Label {...infoBoxProps} label={info} />;
             } else {
                 infoBox = <ValueList {...infoBoxProps} values={info} />;
@@ -366,129 +475,6 @@ export default class EventMarker extends React.Component<InferProps<typeof Event
         return <g>{this.renderMarker(event, column, info)}</g>;
     }
     
-    static propTypes = {
-        type: PropTypes.oneOf(["point", "flag"]),
-
-        /**
-         * What [Pond Event](https://esnet-pondjs.appspot.com/#/event) to mark
-         */
-        event: PropTypes.oneOfType([
-            PropTypes.instanceOf(TimeEvent),
-            PropTypes.instanceOf(IndexedEvent),
-            PropTypes.instanceOf(TimeRangeEvent)
-        ]),
-
-        /**
-         * Which column in the Event to use
-         *
-         * NOTE : Columns can't have periods because periods
-         * represent a path to deep data in the underlying events
-         * (i.e. reference into nested data structures)
-         */
-        column: PropTypes.string,
-
-        /**
-         * The values to show in the info box. This is either an array of
-         * objects, with each object specifying the label and value
-         * to be shown in the info box, or a simple string label. If this
-         * prop is not supplied, no infoBox will be displayed.
-         */
-        info: PropTypes.oneOfType([
-            PropTypes.string,
-            PropTypes.arrayOf(
-                PropTypes.shape({
-                    label: PropTypes.string, // eslint-disable-line
-                    value: PropTypes.string // eslint-disable-line
-                })
-            )
-        ]),
-
-        /**
-         * The style of the info box itself. Typically you'd want to
-         * specify a fill color, and stroke color/width here.
-         */
-        infoStyle: PropTypes.object,
-
-        /**
-         * The width of the info box
-         */
-        infoWidth: PropTypes.number,
-
-        /**
-         * The height of the info box
-         */
-        infoHeight: PropTypes.number,
-
-        /**
-         * Alter the format of the timestamp shown on the info box.
-         * This may be either a function or a string. If you provide a function
-         * that will be passed an Index and should return a string. For example:
-         * ```
-         *     index => moment(index.begin()).format("Do MMM 'YY")
-         * ```
-         * Alternatively you can pass in a d3 format string. That will be applied
-         * to the begin time of the Index range.
-         */
-        infoTimeFormat: PropTypes.any,
-
-        /**
-         * Show a label to the left or right of the marker
-         */
-        markerLabelAlign: PropTypes.oneOf(["left", "right", "top", "bottom"]),
-        markerLabel: PropTypes.any,
-        markerLabelStyle: PropTypes.any,
-
-        marker: PropTypes.string,
-        /**
-         * The radius of the dot at the end of the marker
-         */
-        markerRadius: PropTypes.number,
-
-        /**
-         * The style of the event marker dot
-         */
-        markerStyle: PropTypes.object,
-
-        /**
-         * The y value is calculated by the column and event, but if
-         * this prop is provided this will be used instead.
-         */
-        yValueFunc: PropTypes.func,
-
-        /**
-         * Offset the marker position in the x direction.
-         */
-        offsetX: PropTypes.number,
-
-        /**
-         * Offset the marker position in the y direction
-         */
-        offsetY: PropTypes.number,
-
-        /**
-         * The vertical offset in pixels of the EventMarker info box from the
-         * top of the chart. The default is 20.
-         */
-        infoOffsetY: PropTypes.number,
-
-        /**
-         * [Internal] The timeScale supplied by the surrounding ChartContainer
-         */
-        timeScale: PropTypes.func,
-
-        /**
-         * [Internal] The yScale supplied by the associated YAxis
-         */
-        yScale: PropTypes.func,
-
-        /**
-         * [Internal] The width supplied by the surrounding ChartContainer
-         */
-        width: PropTypes.number,
-
-        stemStyle: PropTypes.any,
-    };
-
     static defaultProps = {
         type: "flag",
         column: "value",

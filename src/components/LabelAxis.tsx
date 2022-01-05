@@ -32,6 +32,70 @@ const defaultStyle: any = {
     }
 };
 
+type LabelAxisProps = {
+        /**
+         * The label to show as the axis.
+         */
+        label: string,
+
+        /**
+         * Show or hide the max/min values that appear alongside the label
+         */
+        hideScale?: boolean,
+
+        /**
+         * Supply a list of label value pairs to render within the LabelAxis.
+         * This expects an array of objects. Each object is of the form:
+         *     {label: "Speed", value: "26.2 mph"}.
+         */
+        values: {
+                label: string, // eslint-disable-line
+                value: number | string
+            }[],
+
+        /**
+         * Width to provide the values
+         */
+        valWidth: number,
+
+        /**
+         * Max value of the axis scale
+         */
+        max: number,
+
+        /**
+         * Min value of the axis scale
+         */
+        min: number,
+
+        /**
+         * If values are numbers, use this format string
+         */
+        format: string,
+
+        /**
+         * The width of the axis
+         */
+        width: number,
+
+        /**
+         * The height of the axis
+         */
+        height: number,
+
+        /**
+         * Object specifying the CSS by which the label axis can be styled. The object can contain:
+         * "label", "values" and "axis". Each of these is an inline CSS style applied
+         * to the axis label, axis values and axis line respectively.
+         *
+         */
+        style: {
+            axis: object, // eslint-disable-line
+            label: object, // eslint-disable-line
+            values: object // esline-disable-line
+        }
+    }
+
 /**
  * Renders an 'axis' that displays a label for a data channel along with a
  * max and average value:
@@ -49,7 +113,7 @@ const defaultStyle: any = {
  * do that. See the Cycling example for exactly how to arrange that.
  *
  */
-export default class LabelAxis extends React.Component<InferProps<typeof LabelAxis.propTypes>> {
+export default class LabelAxis extends React.Component<LabelAxisProps> {
     mergeStyles(style) {
         return {
             axisStyle: merge(
@@ -131,76 +195,6 @@ export default class LabelAxis extends React.Component<InferProps<typeof LabelAx
         );
     }
     
-    static propTypes = {
-        /**
-         * The label to show as the axis.
-         */
-        label: PropTypes.string.isRequired,
-
-        /**
-         * Show or hide the max/min values that appear alongside the label
-         */
-        hideScale: PropTypes.bool,
-
-        /**
-         * Supply a list of label value pairs to render within the LabelAxis.
-         * This expects an array of objects. Each object is of the form:
-         *     {label: "Speed", value: "26.2 mph"}.
-         */
-        values: PropTypes.arrayOf(
-            PropTypes.shape({
-                label: PropTypes.string, // eslint-disable-line
-                value: PropTypes.oneOfType([
-                    // eslint-disable-line
-                    PropTypes.number,
-                    PropTypes.string
-                ])
-            })
-        ).isRequired,
-
-        /**
-         * Width to provide the values
-         */
-        valWidth: PropTypes.number,
-
-        /**
-         * Max value of the axis scale
-         */
-        max: PropTypes.number.isRequired,
-
-        /**
-         * Min value of the axis scale
-         */
-        min: PropTypes.number.isRequired,
-
-        /**
-         * If values are numbers, use this format string
-         */
-        format: PropTypes.string,
-
-        /**
-         * The width of the axis
-         */
-        width: PropTypes.number,
-
-        /**
-         * The height of the axis
-         */
-        height: PropTypes.number,
-
-        /**
-         * Object specifying the CSS by which the label axis can be styled. The object can contain:
-         * "label", "values" and "axis". Each of these is an inline CSS style applied
-         * to the axis label, axis values and axis line respectively.
-         *
-         */
-        style: PropTypes.shape({
-            axis: PropTypes.object, // eslint-disable-line
-            label: PropTypes.object, // eslint-disable-line
-            values: PropTypes.object // esline-disable-line
-        })
-    }
-
     static defaultProps = {
         hideScale: false,
         values: [],

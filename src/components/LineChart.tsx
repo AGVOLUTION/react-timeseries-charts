@@ -13,7 +13,7 @@ import { line } from "d3-shape";
 import merge from "merge";
 import React from "react";
 import PropTypes, { InferProps } from "prop-types";
-import { TimeSeries } from "pondjs";
+import { Key, TimeSeries } from "pondjs";
 
 import { Styler } from "../js/styler";
 import { scaleAsString } from "../js/util";
@@ -25,6 +25,125 @@ const defaultStyle: any = {
     selected: { stroke: "steelblue", fill: "none", strokeWidth: 2 },
     muted: { stroke: "steelblue", fill: "none", opacity: 0.4, strokeWidth: 1 }
 };
+
+type LineChartProps<T extends Key> = {
+        /**
+         * Show or hide this chart
+         */
+        visible?: boolean,
+    
+        /**
+         * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
+         */
+        series: TimeSeries<T>,
+    
+        /**
+         * Reference to the axis which provides the vertical scale for drawing.
+         * e.g. specifying `axis="trafficRate"` would refer the y-scale of the YAxis
+         * with id="trafficRate".
+         */
+        axis: string, // eslint-disable-line
+    
+        /**
+         * Which columns from the series to draw.
+         * 
+         * NOTE : Columns can't have periods because periods 
+         * represent a path to deep data in the underlying events 
+         * (i.e. reference into nested data structures)
+         */
+        columns: string[],
+    
+        /**
+         * The styles to apply to the underlying SVG lines. This is a mapping
+         * of column names to objects with style attributes, in the following
+         * format:
+         *
+         * ```
+         * const style: any = {
+         *     in: {
+         *         normal: {stroke: "steelblue", fill: "none", strokeWidth: 1},
+         *         highlighted: {stroke: "#5a98cb", fill: "none", strokeWidth: 1},
+         *         selected: {stroke: "steelblue", fill: "none", strokeWidth: 1},
+         *         muted: {stroke: "steelblue", fill: "none", opacity: 0.4, strokeWidth: 1}
+         *     },
+         *     out: {
+         *         ...
+         *     }
+         * };
+         *
+         *  <LineChart style={style} ... />
+         * ```
+         *
+         * Alternatively, you can pass in a `Styler`. For example:
+         *
+         * ```
+         * const currencyStyle = Styler([
+         *     {key: "aud", color: "steelblue", width: 1, dashed: true},
+         *     {key: "euro", color: "#F68B24", width: 2}
+         * ]);
+         *
+         * <LineChart columns={["aud", "euro"]} style={currencyStyle} ... />
+         *
+         * ```
+         */
+        style: object | Function | Styler,
+    
+        /**
+         * Any of D3's interpolation modes.
+         */
+        interpolation: D3interpolation,
+    
+        /**
+         * The determines how to handle bad/missing values in the supplied
+         * TimeSeries. A missing value can be null or NaN. If breakLine
+         * is set to true (the default) then the line will be broken on either
+         * side of the bad value(s). If breakLine is false bad values
+         * are simply removed and the adjoining points are connected.
+         */
+        breakLine?: boolean,
+    
+        /**
+         * The selected item, which will be rendered in the "selected" style.
+         * If a line is selected, all other lines will be rendered in the "muted" style.
+         *
+         * See also `onSelectionChange`
+         */
+        selection: string,
+    
+        /**
+         * A callback that will be called when the selection changes. It will be called
+         * with the column corresponding to the line being clicked.
+         */
+        onSelectionChange: Function,
+    
+        /**
+         * The highlighted column, which will be rendered in the "highlighted" style.
+         *
+         * See also `onHighlightChange`
+         */
+        highlight: string,
+    
+        /**
+         * A callback that will be called when the hovered over line changes.
+         * It will be called with the corresponding column.
+         */
+        onHighlightChange: Function,
+    
+        /**
+         * [Internal] The timeScale supplied by the surrounding ChartContainer
+         */
+        timeScale: Function,
+    
+        /**
+         * [Internal] The yScale supplied by the associated YAxis
+         */
+        yScale: Function,
+    
+        /**
+         * [Internal] The width supplied by the surrounding ChartContainer
+         */
+        width: number
+    };
 
 /**
  * The `<LineChart>` component is able to display multiple columns of a TimeSeries
@@ -52,7 +171,7 @@ const defaultStyle: any = {
   </ChartContainer>
  * ```
  */
-export default class LineChart extends React.Component<InferProps<typeof LineChart.propTypes>> {
+export default class LineChart<T extends Key> extends React.Component<LineChartProps<T>> {
     shouldComponentUpdate(nextProps) {
         const newSeries = nextProps.series;
         const oldSeries = this.props.series;
@@ -117,9 +236,9 @@ export default class LineChart extends React.Component<InferProps<typeof LineCha
         if (this.props.style) {
             if (this.props.style instanceof Styler) {
                 style = this.props.style.lineChartStyle()[column];
-            } else if (_.isFunction(this.props.style)) {
+            } else if (typeof this.props.style === "function") {
                 style = (this.props.style as Function)(column);
-            } else if (_.isObject(this.props.style)) {
+            } else if (typeof this.props.style === "object") {
                 style = this.props.style ? this.props.style[column] : defaultStyle;
             }
         }
@@ -180,8 +299,8 @@ export default class LineChart extends React.Component<InferProps<typeof LineCha
         // D3 generates each path
         const path = line()
             .curve(curves[this.props.interpolation])
-            .x(d => this.props.timeScale(d.x))
-            .y(d => this.props.yScale(d.y))(data);
+            .x(([x]) => this.props.timeScale(x))
+            .y(([y]) => this.props.yScale(y))(data);
 
         return (
             <g key={key}>
@@ -207,7 +326,7 @@ export default class LineChart extends React.Component<InferProps<typeof LineCha
         if (this.props.breakLine) {
             // Remove nulls and NaNs from the line by generating a break in the line
             let currentPoints = null;
-            for (const d of this.props.series.events()) {
+            for (const d of this.props.series.eventList()) {
                 const timestamp = new Date(
                     d.begin().getTime() + (d.end().getTime() - d.begin().getTime()) / 2
                 );
@@ -231,7 +350,7 @@ export default class LineChart extends React.Component<InferProps<typeof LineCha
         } else {
             // Ignore nulls and NaNs in the line
             const cleanedPoints = [];
-            for (const d of this.props.series.events()) {
+            for (const d of this.props.series.eventList()) {
                 const timestamp = new Date(
                     d.begin().getTime() + (d.end().getTime() - d.begin().getTime()) / 2
                 );
@@ -253,142 +372,6 @@ export default class LineChart extends React.Component<InferProps<typeof LineCha
         return <g>{this.renderLines()}</g>;
     }
 
-    static propTypes = {
-        /**
-         * Show or hide this chart
-         */
-        visible: PropTypes.bool,
-    
-        /**
-         * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
-         */
-        // series: PropTypes.instanceOf(TimeSeries).isRequired,
-        series: PropTypes.any.isRequired,
-    
-        /**
-         * Reference to the axis which provides the vertical scale for drawing.
-         * e.g. specifying `axis="trafficRate"` would refer the y-scale of the YAxis
-         * with id="trafficRate".
-         */
-        axis: PropTypes.string.isRequired, // eslint-disable-line
-    
-        /**
-         * Which columns from the series to draw.
-         * 
-         * NOTE : Columns can't have periods because periods 
-         * represent a path to deep data in the underlying events 
-         * (i.e. reference into nested data structures)
-         */
-        columns: PropTypes.arrayOf(PropTypes.string),
-    
-        /**
-         * The styles to apply to the underlying SVG lines. This is a mapping
-         * of column names to objects with style attributes, in the following
-         * format:
-         *
-         * ```
-         * const style: any = {
-         *     in: {
-         *         normal: {stroke: "steelblue", fill: "none", strokeWidth: 1},
-         *         highlighted: {stroke: "#5a98cb", fill: "none", strokeWidth: 1},
-         *         selected: {stroke: "steelblue", fill: "none", strokeWidth: 1},
-         *         muted: {stroke: "steelblue", fill: "none", opacity: 0.4, strokeWidth: 1}
-         *     },
-         *     out: {
-         *         ...
-         *     }
-         * };
-         *
-         *  <LineChart style={style} ... />
-         * ```
-         *
-         * Alternatively, you can pass in a `Styler`. For example:
-         *
-         * ```
-         * const currencyStyle = Styler([
-         *     {key: "aud", color: "steelblue", width: 1, dashed: true},
-         *     {key: "euro", color: "#F68B24", width: 2}
-         * ]);
-         *
-         * <LineChart columns={["aud", "euro"]} style={currencyStyle} ... />
-         *
-         * ```
-         */
-        style: PropTypes.oneOfType([PropTypes.object, PropTypes.func, PropTypes.instanceOf(Styler)]),
-    
-        /**
-         * Any of D3's interpolation modes.
-         */
-        interpolation: PropTypes.oneOf([
-            "curveBasis",
-            "curveBasisOpen",
-            "curveBundle",
-            "curveCardinal",
-            "curveCardinalOpen",
-            "curveCatmullRom",
-            "curveCatmullRomOpen",
-            "curveLinear",
-            "curveMonotoneX",
-            "curveMonotoneY",
-            "curveNatural",
-            "curveRadial",
-            "curveStep",
-            "curveStepAfter",
-            "curveStepBefore"
-        ]),
-    
-        /**
-         * The determines how to handle bad/missing values in the supplied
-         * TimeSeries. A missing value can be null or NaN. If breakLine
-         * is set to true (the default) then the line will be broken on either
-         * side of the bad value(s). If breakLine is false bad values
-         * are simply removed and the adjoining points are connected.
-         */
-        breakLine: PropTypes.bool,
-    
-        /**
-         * The selected item, which will be rendered in the "selected" style.
-         * If a line is selected, all other lines will be rendered in the "muted" style.
-         *
-         * See also `onSelectionChange`
-         */
-        selection: PropTypes.string,
-    
-        /**
-         * A callback that will be called when the selection changes. It will be called
-         * with the column corresponding to the line being clicked.
-         */
-        onSelectionChange: PropTypes.func,
-    
-        /**
-         * The highlighted column, which will be rendered in the "highlighted" style.
-         *
-         * See also `onHighlightChange`
-         */
-        highlight: PropTypes.string,
-    
-        /**
-         * A callback that will be called when the hovered over line changes.
-         * It will be called with the corresponding column.
-         */
-        onHighlightChange: PropTypes.func,
-    
-        /**
-         * [Internal] The timeScale supplied by the surrounding ChartContainer
-         */
-        timeScale: PropTypes.func,
-    
-        /**
-         * [Internal] The yScale supplied by the associated YAxis
-         */
-        yScale: PropTypes.func,
-    
-        /**
-         * [Internal] The width supplied by the surrounding ChartContainer
-         */
-        width: PropTypes.number
-    };
-    
     static defaultProps = {
         visible: true,
         columns: ["value"],

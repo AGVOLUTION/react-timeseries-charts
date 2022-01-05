@@ -11,6 +11,41 @@
 import React from "react";
 import PropTypes, { InferProps } from "prop-types";
 import { TimeRange } from "pondjs";
+import { ScaleTime } from "d3-scale";
+
+type TimeRangeMarkerProps = {
+        /**
+         * Show or hide this marker
+         */
+        visible?: boolean,
+
+        /**
+         * The timerange to mark. This is in the form of a
+         * [Pond TimeRange](https://esnet-pondjs.appspot.com/#/timerange)
+         */
+        timerange: TimeRange,
+
+        /**
+         * The style of the rect that will be rendered as a SVG <Rect>. This
+         * object is the inline CSS for that rect.
+         */
+        style: object, // eslint-disable-line
+
+        /**
+         * [Internal] The timeScale supplied by the surrounding ChartContainer
+         */
+        timeScale: ScaleTime<any, any>,
+
+        /**
+         * [Internal] The width supplied by the surrounding ChartContainer
+         */
+        width: number,
+
+        /**
+         * [Internal] The height supplied by the surrounding ChartContainer
+         */
+        height: number
+    }
 
 /**
  * Renders a band with extents defined by the supplied TimeRange. This
@@ -22,7 +57,7 @@ import { TimeRange } from "pondjs";
  * See also the Brush component for a TimeRange marker that you can
  * resize interactively.
  */
-export default class TimeRangeMarker extends React.Component<InferProps<typeof TimeRangeMarker.propTypes>> {
+export default class TimeRangeMarker extends React.Component<TimeRangeMarkerProps> {
     renderBand() {
         const timerange = this.props.timerange;
         const timeScale = this.props.timeScale;
@@ -40,7 +75,7 @@ export default class TimeRangeMarker extends React.Component<InferProps<typeof T
         }
 
         if (!viewport.disjoint(timerange)) {
-            const range = timerange.intersection(viewport);
+            const range = timerange.intersection(viewport) as TimeRange;
             const begin = range.begin();
             const end = range.end();
             const beginPos = timeScale(begin);
@@ -66,40 +101,6 @@ export default class TimeRangeMarker extends React.Component<InferProps<typeof T
         return <g>{this.renderBand()}</g>;
     }
     
-    static propTypes = {
-        /**
-         * Show or hide this marker
-         */
-        visible: PropTypes.bool,
-
-        /**
-         * The timerange to mark. This is in the form of a
-         * [Pond TimeRange](https://esnet-pondjs.appspot.com/#/timerange)
-         */
-        timerange: PropTypes.any.isRequired,
-
-        /**
-         * The style of the rect that will be rendered as a SVG <Rect>. This
-         * object is the inline CSS for that rect.
-         */
-        style: PropTypes.object, // eslint-disable-line
-
-        /**
-         * [Internal] The timeScale supplied by the surrounding ChartContainer
-         */
-        timeScale: PropTypes.any.isRequired,
-
-        /**
-         * [Internal] The width supplied by the surrounding ChartContainer
-         */
-        width: PropTypes.number.isRequired,
-
-        /**
-         * [Internal] The height supplied by the surrounding ChartContainer
-         */
-        height: PropTypes.number.isRequired
-    };
-
     static defaultProps = {
         visible: true,
         spacing: 1,

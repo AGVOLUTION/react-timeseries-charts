@@ -9,6 +9,7 @@
         "moduleResolution": "node",
         "outDir": "lib",
         "skipLibCheck": true,
+        "downlevelIteration": true,
         "baseUrl": "src"
     },
     "include": [

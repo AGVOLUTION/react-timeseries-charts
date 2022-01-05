@@ -257,7 +257,92 @@ class LegendItem extends React.Component<any> {
     }
 }
 
-export default class Legend extends React.Component<InferProps<typeof Legend.propTypes>> {
+type LegendProps = {
+        /**
+         * The overall style of the legend items, either a color "swatch", a
+         * colored "line", or a "dot".
+         */
+        type: "swatch" | "line" | "dot",
+
+        /**
+         * Alignment of the legend within the available space. Either left or right.
+         */
+        align: "left" | "right",
+
+        style: object | Function | Styler,
+
+        /**
+         * The categories array specifies details and style for each item in the legend. For each item:
+         *  * "key" - (required) the name by which the legend will be known
+         *  * "label" - (required) the displayed label
+         *  * "style" - the swatch, dot, or line style. Typically you'd just
+         *              specify {backgroundColor: "#1f77b4"}
+         *  * "labelStyle" - the label style
+         *  * "disabled" - a disabled state
+         *
+         * ```
+         * const categories = [
+         *    {key: "aust", label: "AUD", disabled: this.state.disabled["aust"],
+         *      style: {backgroundColor: "#1f77b4"}},
+         *    {key: "usa", label: "USD", disabled: this.state.disabled["usa"],
+         *      style: {backgroundColor: "#aec7e8"}}
+         * ];
+         * ```
+         */
+        categories: {
+            key: string, // eslint-disable-line
+            label: string, // eslint-disable-line
+            disabled?: boolean, // eslint-disable-line
+            style: object, // eslint-disable-line
+            labelStyle: object, // eslint-disable-line
+            value: any, // eslint-disable-line
+            symbolType: any, // eslint-disable-line
+        }[],
+
+        /**
+         * The width of the legend symbol
+         */
+        symbolWidth: number,
+
+        /**
+         * The height of the legend symbol
+         */
+        symbolHeight: number,
+
+        /**
+         * Which item, specified by its key, should be rendered as highlighted
+         */
+        highlight: string,
+
+        /**
+         * Which item, specified by its key, should be rendered as selected
+         */
+        selection: string,
+
+        /**
+         * Callback will be called with a legend item is selected (i.e. it is clicked
+         * on by the user)
+         */
+        onSelectionChange: Function,
+
+        /**
+         * Callback will be called with a legend item is highlighted (i.e. it is hovered
+         * over by the user)
+         */
+        onHighlightChange: Function,
+
+        /**
+         * Defines whether to stack legend items vertically or not
+         */
+        stack?: boolean,
+
+        /**
+         * The margin at the bottom. Default value is 20px
+         */
+        marginBottom: string
+    };
+
+export default class Legend extends React.Component<LegendProps> {
     handleClick(e, key) {
         e.stopPropagation();
         if (this.props.onSelectionChange) {
@@ -290,9 +375,9 @@ export default class Legend extends React.Component<InferProps<typeof Legend.pro
         if (this.props.style) {
             if (this.props.style instanceof Styler) {
                 style = this.props.style.legendStyle(category.key, type);
-            } else if (_.isFunction(this.props.style)) {
+            } else if (typeof this.props.style === "function") {
                 style = (this.props.style as Function)(category.key);
-            } else if (_.isObject(this.props.style)) {
+            } else if (typeof this.props.style === "object") {
                 style = this.props.style ? this.props.style[category.key] : defaultStyle;
             }
         }
@@ -414,93 +499,6 @@ export default class Legend extends React.Component<InferProps<typeof Legend.pro
         }
     }
     
-    static propTypes = {
-        /**
-         * The overall style of the legend items, either a color "swatch", a
-         * colored "line", or a "dot".
-         */
-        type: PropTypes.oneOf(["swatch", "line", "dot"]),
-
-        /**
-         * Alignment of the legend within the available space. Either left or right.
-         */
-        align: PropTypes.oneOf(["left", "right"]),
-
-        style: PropTypes.oneOfType([PropTypes.object, PropTypes.func, PropTypes.instanceOf(Styler)]),
-
-        /**
-         * The categories array specifies details and style for each item in the legend. For each item:
-         *  * "key" - (required) the name by which the legend will be known
-         *  * "label" - (required) the displayed label
-         *  * "style" - the swatch, dot, or line style. Typically you'd just
-         *              specify {backgroundColor: "#1f77b4"}
-         *  * "labelStyle" - the label style
-         *  * "disabled" - a disabled state
-         *
-         * ```
-         * const categories = [
-         *    {key: "aust", label: "AUD", disabled: this.state.disabled["aust"],
-         *      style: {backgroundColor: "#1f77b4"}},
-         *    {key: "usa", label: "USD", disabled: this.state.disabled["usa"],
-         *      style: {backgroundColor: "#aec7e8"}}
-         * ];
-         * ```
-         */
-        categories: PropTypes.arrayOf(
-            PropTypes.shape({
-                key: PropTypes.string.isRequired, // eslint-disable-line
-                label: PropTypes.string.isRequired, // eslint-disable-line
-                disabled: PropTypes.bool, // eslint-disable-line
-                style: PropTypes.object, // eslint-disable-line
-                labelStyle: PropTypes.object, // eslint-disable-line
-                value: PropTypes.any, // eslint-disable-line
-                symbolType: PropTypes.any, // eslint-disable-line
-            })
-        ).isRequired,
-
-        /**
-         * The width of the legend symbol
-         */
-        symbolWidth: PropTypes.number,
-
-        /**
-         * The height of the legend symbol
-         */
-        symbolHeight: PropTypes.number,
-
-        /**
-         * Which item, specified by its key, should be rendered as highlighted
-         */
-        highlight: PropTypes.string,
-
-        /**
-         * Which item, specified by its key, should be rendered as selected
-         */
-        selection: PropTypes.string,
-
-        /**
-         * Callback will be called with a legend item is selected (i.e. it is clicked
-         * on by the user)
-         */
-        onSelectionChange: PropTypes.func,
-
-        /**
-         * Callback will be called with a legend item is highlighted (i.e. it is hovered
-         * over by the user)
-         */
-        onHighlightChange: PropTypes.func,
-
-        /**
-         * Defines whether to stack legend items vertically or not
-         */
-        stack: PropTypes.bool,
-
-        /**
-         * The margin at the bottom. Default value is 20px
-         */
-        marginBottom: PropTypes.string
-    };
-
     static defaultProps = {
         style: {},
         labelStyle: {},

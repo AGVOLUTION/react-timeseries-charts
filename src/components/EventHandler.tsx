@@ -15,6 +15,23 @@ import PropTypes, { InferProps } from "prop-types";
 import { TimeRange } from "pondjs";
 
 import { getElementOffset } from "../js/util";
+import { ScaleTime } from "d3-scale";
+
+type EventHandlerProps = {
+        enablePanZoom?: boolean,
+        enableDragZoom?: boolean,
+        scale: ScaleTime<any, any>,
+        width: number,
+        height: number,
+        maxTime: Date,
+        minTime: Date,
+        minDuration: number,
+        onZoom: Function,
+        onMouseMove: Function,
+        onMouseOut: Function,
+        onMouseClick: Function,
+        onContextMenu: Function
+    }
 
 /**
  * Internal component which provides the top level event catcher for the charts.
@@ -24,7 +41,7 @@ import { getElementOffset } from "../js/util";
  * The EventHandler is responsible for pan and zoom events as well as other click
  * and hover actions.
  */
-export default class EventHandler extends React.Component<InferProps<typeof EventHandler.propTypes>, any> {
+export default class EventHandler extends React.Component<EventHandlerProps, any> {
     eventRect: any;
     eventHandlerRef: any;
     constructor(props) {
@@ -194,8 +211,8 @@ export default class EventHandler extends React.Component<InferProps<typeof Even
                 const start = this.props.scale.invert(this.state.initialDragZoom).getTime();
                 const end = this.props.scale.invert(this.state.currentDragZoom).getTime();
 
-                let newBegin = parseInt(start, 10);
-                let newEnd = parseInt(end, 10);
+                let newBegin = parseInt(start as any, 10);
+                let newEnd = parseInt(end as any, 10);
 
                 if (this.props.minTime && newBegin < this.props.minTime.getTime()) {
                     newBegin = this.props.minTime.getTime();
@@ -335,23 +352,6 @@ export default class EventHandler extends React.Component<InferProps<typeof Even
         );
     }
     
-    static propTypes = {
-        children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-        enablePanZoom: PropTypes.bool,
-        enableDragZoom: PropTypes.bool,
-        scale: PropTypes.any.isRequired,
-        width: PropTypes.number.isRequired,
-        height: PropTypes.number.isRequired,
-        maxTime: PropTypes.instanceOf(Date),
-        minTime: PropTypes.instanceOf(Date),
-        minDuration: PropTypes.number,
-        onZoom: PropTypes.func,
-        onMouseMove: PropTypes.func,
-        onMouseOut: PropTypes.func,
-        onMouseClick: PropTypes.func,
-        onContextMenu: PropTypes.func
-    };
-
     static defaultProps = {
         enablePanZoom: false,
         enableDragZoom: false

@@ -47,6 +47,85 @@ function createScale(yaxis, type, min, max, y0, y1) {
     return scale;
 }
 
+type ChartRowProps = {
+        /**
+         * The height of the row.
+         */
+        height: string | number,
+
+        /**
+         * The vertical margin between the top and bottom of the row
+         * height and the top and bottom of the range of the chart.
+         */
+        axisMargin: number,
+
+        /**
+         * Show or hide this row
+         */
+        visible?: boolean,
+
+        /**
+         * Should the time be shown on top of the tracker info box
+         */
+        trackerShowTime?: boolean,
+
+        /**
+         * The width of the tracker info box
+         */
+        trackerInfoWidth: number,
+
+        /**
+         * The height of the tracker info box
+         */
+        trackerInfoHeight: number,
+
+        trackerStyle: object,
+
+        paddingLeft: number,
+        paddingRight: number,
+
+
+        /**
+         * Info box value or values to place next to the tracker line.
+         * This is either an array of objects, with each object
+         * specifying the label (a string) and value (also a string)
+         * to be shown in the info box, or a simple string label.
+         */
+        trackerInfoValues: string | {
+            label: string, // eslint-disable-line
+            value: string // eslint-disable-line
+        }[],
+
+        /**
+         * Specify the title for the chart row
+         */
+        title: string,
+
+        /**
+         * Specify the height of the title
+         * Default value is 28 pixels
+         */
+        titleHeight: number,
+
+        /**
+         * Specify the styling of the chart row's title
+         */
+        titleStyle: object,
+
+        /**
+         * Specify the styling of the box behind chart row's title
+         */
+        titleBoxStyle: object,
+
+        leftAxisWidths: number[],
+        rightAxisWidths: number[],
+        width: number,
+        timeScale: Function,
+        trackerTimeFormat: string | Function,
+        timeFormat: string | Function,
+        trackerTime: Date
+    }
+
 /**
  * A ChartRow is a container for a set of YAxis and multiple charts
  * which are overlaid on each other in a central canvas.
@@ -75,7 +154,7 @@ function createScale(yaxis, type, min, max, y0, y1) {
  * </ChartContainer>
  * ```
  */
-export default class ChartRow extends React.Component<InferProps<typeof ChartRow.propTypes>, any> {
+export default class ChartRow extends React.Component<ChartRowProps, any> {
     mounted: boolean;
     scaleMap: any;
     constructor(props) {
@@ -94,8 +173,8 @@ export default class ChartRow extends React.Component<InferProps<typeof ChartRow
         this.mounted = true;
     }
 
-    isChildYAxis = child =>
-        areComponentsEqual(child.type, YAxis) ||
+    isChildYAxis = (child: JSX.Element) =>
+        child.type === YAxis ||
         (_.has(child.props, "min") && _.has(child.props, "max"));
 
     updateScales(props) {
@@ -187,7 +266,7 @@ export default class ChartRow extends React.Component<InferProps<typeof ChartRow
         let alignLeft = true;
         React.Children.forEach(this.props.children, (child: any) => {
             if (child === null) return;
-            if (areComponentsEqual(child.type, Charts)) {
+            if (child.type === Charts) {
                 alignLeft = false;
             } else {
                 const id = child.props.id;
@@ -313,7 +392,7 @@ export default class ChartRow extends React.Component<InferProps<typeof ChartRow
         let keyCount = 0;
         React.Children.forEach(this.props.children, (child: any) => {
             if (child === null) return;
-            if (areComponentsEqual(child.type, Charts)) {
+            if (child.type === Charts) {
                 const charts = child;
                 React.Children.forEach(charts.props.children, chart => {
                     if (!_.has(chart.props, "visible") || chart.props.visible) {
@@ -360,11 +439,11 @@ export default class ChartRow extends React.Component<InferProps<typeof ChartRow
         const brushList = [];
         const multiBrushList = [];
         keyCount = 0;
-        React.Children.forEach(this.props.children, (child: any) => {
+        React.Children.forEach(this.props.children, (child: JSX.Element) => {
             if (child === null) return;
             if (
-                areComponentsEqual(child.type, Brush) ||
-                areComponentsEqual(child.type, MultiBrush)
+                child.type === Brush ||
+                child.type === MultiBrush
             ) {
                 const brushProps: any = {
                     key: `brush-${keyCount}`,
@@ -372,7 +451,7 @@ export default class ChartRow extends React.Component<InferProps<typeof ChartRow
                     height: innerHeight,
                     timeScale: this.props.timeScale
                 };
-                if (areComponentsEqual(child.type, Brush)) {
+                if (child.type === Brush) {
                     brushList.push(React.cloneElement(child, brushProps));
                 } else {
                     multiBrushList.push(React.cloneElement(child, brushProps));
@@ -477,88 +556,4 @@ export default class ChartRow extends React.Component<InferProps<typeof ChartRow
         visible: true
     }
 
-    static propTypes = {
-        /**
-         * The height of the row.
-         */
-        height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-
-        /**
-         * The vertical margin between the top and bottom of the row
-         * height and the top and bottom of the range of the chart.
-         */
-        axisMargin: PropTypes.number,
-
-        /**
-         * Show or hide this row
-         */
-        visible: PropTypes.bool,
-
-        /**
-         * Should the time be shown on top of the tracker info box
-         */
-        trackerShowTime: PropTypes.bool,
-
-        /**
-         * The width of the tracker info box
-         */
-        trackerInfoWidth: PropTypes.number,
-
-        /**
-         * The height of the tracker info box
-         */
-        trackerInfoHeight: PropTypes.number,
-
-        trackerStyle: PropTypes.any,
-
-        paddingLeft: PropTypes.number,
-        paddingRight: PropTypes.number,
-
-
-        /**
-         * Info box value or values to place next to the tracker line.
-         * This is either an array of objects, with each object
-         * specifying the label (a string) and value (also a string)
-         * to be shown in the info box, or a simple string label.
-         */
-        trackerInfoValues: PropTypes.oneOfType([
-            PropTypes.string,
-            PropTypes.arrayOf(
-                PropTypes.shape({
-                    label: PropTypes.string, // eslint-disable-line
-                    value: PropTypes.string // eslint-disable-line
-                })
-            )
-        ]),
-
-        /**
-         * Specify the title for the chart row
-         */
-        title: PropTypes.string,
-
-        /**
-         * Specify the height of the title
-         * Default value is 28 pixels
-         */
-        titleHeight: PropTypes.number,
-
-        /**
-         * Specify the styling of the chart row's title
-         */
-        titleStyle: PropTypes.object,
-
-        /**
-         * Specify the styling of the box behind chart row's title
-         */
-        titleBoxStyle: PropTypes.object,
-
-        children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-        leftAxisWidths: PropTypes.arrayOf(PropTypes.number),
-        rightAxisWidths: PropTypes.arrayOf(PropTypes.number),
-        width: PropTypes.number,
-        timeScale: PropTypes.func,
-        trackerTimeFormat: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-        timeFormat: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-        trackerTime: PropTypes.instanceOf(Date)
-    }
 }

@@ -43,6 +43,36 @@ function mergeStyles(style, isCentered) {
     };
 }
 
+type ValueListProps = {
+    /**
+     * Where to position the label, either "left" or "center" within the box
+     */
+    align: "center" | "left",
+
+    /**
+     * An array of label value pairs to render
+     */
+    values: {
+            label: string, // eslint-disable-line
+            value: number | string
+        }[],
+
+    /**
+     * CSS object to be applied to the ValueList surrounding box and the label (text).
+     */
+    style: object, // eslint-disable-line
+
+    /**
+     * The width of the rectangle to render into
+     */
+    width: number,
+
+    /**
+     * The height of the rectangle to render into
+     */
+    height: number
+}
+
 /**
  * Renders a list of values in svg
  *
@@ -51,7 +81,7 @@ function mergeStyles(style, isCentered) {
  *      | Avg 26 Gbps    |
  *      +----------------+
  */
-const ValueList = props => {
+const ValueList = (props: ValueListProps) => {
     const { align, style, width, height } = props;
     const { boxStyle, labelStyle } = mergeStyles(style, align === "center");
 
@@ -98,42 +128,6 @@ ValueList.defaultProps = {
     height: 100,
     pointerEvents: "none",
     style: { fill: "#FEFEFE", stroke: "#DDD", opacity: 0.8 }
-};
-
-ValueList.propTypes = {
-    /**
-     * Where to position the label, either "left" or "center" within the box
-     */
-    align: PropTypes.oneOf(["center", "left"]),
-
-    /**
-     * An array of label value pairs to render
-     */
-    values: PropTypes.arrayOf(
-        PropTypes.shape({
-            label: PropTypes.string, // eslint-disable-line
-            value: PropTypes.oneOfType([
-                // eslint-disable-line
-                PropTypes.number,
-                PropTypes.string
-            ])
-        })
-    ).isRequired,
-
-    /**
-     * CSS object to be applied to the ValueList surrounding box and the label (text).
-     */
-    style: PropTypes.object, // eslint-disable-line
-
-    /**
-     * The width of the rectangle to render into
-     */
-    width: PropTypes.number,
-
-    /**
-     * The height of the rectangle to render into
-     */
-    height: PropTypes.number
 };
 
 export default ValueList;

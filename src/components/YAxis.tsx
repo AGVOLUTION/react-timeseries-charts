@@ -50,6 +50,130 @@ const defaultStyle: any = {
     }
 };
 
+type YAxisProps = {
+
+        isInnerAxis: boolean,
+        chartExtent: any,
+        
+        /**
+         * A name for the axis which can be used by a chart to reference the axis.
+         * This is used by the ChartRow to match charts to this axis.
+         */
+        id: string, // eslint-disable-line
+    
+        /**
+         * Show or hide this axis
+         */
+        visible?: boolean,
+    
+        /**
+         * The label to be displayed alongside the axis.
+         */
+        label: string,
+    
+        /**
+         * The scale type: linear, power, or log.
+         */
+        type: "linear" | "power" | "log",
+    
+        /**
+         * Minimum value, which combined with "max", define the scale of the axis.
+         */
+        min: number, // eslint-disable-line
+    
+        /**
+         * Maximum value, which combined with "min", define the scale of the axis.
+         */
+        max: number, // eslint-disable-line
+    
+        /**
+         * A d3 scale for the y-axis which you can use to transform your data in the y direction.
+         * If omitted, the scale will be automatically computed based on the max and min props.
+         */
+        yScale: Function,
+    
+        /**
+         * Render all ticks on the axis as positive values.
+         */
+        absolute?: boolean, // eslint-disable-line
+    
+        /**
+         * Object specifying the CSS by which the axis can be styled. The object can contain:
+         * "label", "values", "axis" and "ticks". Each of these is an inline CSS style applied
+         * to the axis label, axis values, axis line and ticks respectively.
+         *
+         * Note that these are passed into d3's styling, so are regular CSS property names
+         * and not React's camel case names (e.g. "stroke-dasharray" not strokeDasharray).
+         */
+        style: {
+            label: object, // eslint-disable-line
+            axis: object, // eslint-disable-line
+            values: object, // esline-disable-line
+            ticks: object // esline-disable-line
+        },
+    
+        /**
+         * Render a horizontal grid by extending the axis ticks across the chart area. Note that this
+         * can only be applied to an inner axis (one next to a chart). If you have multiple axes then
+         * this can't be used on the outer axes. Also, if you have an axis on either side of the chart
+         * then you can use this, but the UX not be ideal.
+         */
+        showGrid?: boolean,
+    
+        /**
+         * Render the axis line. This is a nice option of you are also using `showGrid` as you may not
+         * want both the vertical axis line and the extended ticks.
+         */
+        hideAxisLine?: boolean,
+    
+        /**
+         * The transition time for moving from one scale to another
+         */
+        transition: number,
+    
+        /**
+         * The width of the axis
+         */
+        width: string | number
+    
+        /**
+         * Offset the axis label from its default position. This allows you to
+         * fine tune the label location, which may be necessary depending on the
+         * scale and how much room the tick labels take up. Maybe positive or
+         * negative.
+         */
+        labelOffset: number,
+    
+        /**
+         * If a string, the d3.format for the axis labels (e.g. `format=\"$,.2f\"`).
+         * If a function, that function will be called with each tick value and
+         * should generate a formatted string for that value to be used as the label
+         * for that tick (e.g. `function (n) { return Number(n).toFixed(2) }`).
+         */
+        format: string | Function,
+    
+        /**
+         * If the chart should be rendered to with the axis on the left or right.
+         * If you are using the axis in a ChartRow, you do not need to provide this.
+         */
+        align: string,
+    
+        /**
+         * [Internal] The scale supplied by the ChartRow
+         */
+        scale: Function,
+    
+        /**
+         * [Internal] The height supplied by the surrounding ChartContainer
+         */
+        height: number,
+    
+        /**
+         * The number of ticks
+         */
+        tickCount: number
+    };
+
 /**
  * The `YAxis` widget displays a vertical axis to the left or right
  * of the charts. A `YAxis` always appears within a `ChartRow`, from
@@ -100,7 +224,7 @@ const defaultStyle: any = {
  *  Each of the line charts uses its `axis` prop to identify the axis ("aud" or "euro")
  *  it will use for its vertical scale.
  */
-export default class YAxis extends React.Component<InferProps<typeof YAxis.propTypes>> {
+export default class YAxis extends React.Component<YAxisProps> {
     axis: any;
     componentDidMount() {
         this.renderAxis(
@@ -193,9 +317,9 @@ export default class YAxis extends React.Component<InferProps<typeof YAxis.propT
     }
 
     yformat(fmt) {
-        if (_.isString(fmt)) {
+        if (typeof fmt === "string") {
             return format(fmt);
-        } else if (_.isFunction(fmt)) {
+        } else if (typeof fmt === "function") {
             return fmt;
         } else {
             return format("");
@@ -233,13 +357,13 @@ export default class YAxis extends React.Component<InferProps<typeof YAxis.propT
             .select("g")
             .selectAll(".tick")
             .select("text")
-            .styles(valueStyle);
+            ["styles"](valueStyle);
 
         select(ReactDOM.findDOMNode(this))
             .select("g")
             .selectAll(".tick")
             .select("line")
-            .styles(tickStyle);
+            ["styles"](tickStyle);
 
         select(ReactDOM.findDOMNode(this))
             .select("g")
@@ -250,7 +374,7 @@ export default class YAxis extends React.Component<InferProps<typeof YAxis.propT
             select(ReactDOM.findDOMNode(this))
                 .select("g")
                 .append("line")
-                .styles(axisStyle)
+                ["styles"](axisStyle)
                 .attr("x1", 0)
                 .attr("y1", 0)
                 .attr("x2", 0)
@@ -353,7 +477,7 @@ export default class YAxis extends React.Component<InferProps<typeof YAxis.propT
             .append("g")
             .attr("transform", `translate(${x},0)`)
             .attr("class", "yaxis")
-            .styles(valueStyle)
+            ["styles"](valueStyle)
             .call(axisGenerator.tickSize(tickSize))
             .append("text")
             .text(label || this.props.label)
@@ -439,127 +563,4 @@ export default class YAxis extends React.Component<InferProps<typeof YAxis.propT
         style: defaultStyle
     };
     
-    static propTypes = {
-
-        isInnerAxis: PropTypes.any,
-        chartExtent: PropTypes.any,
-        
-        /**
-         * A name for the axis which can be used by a chart to reference the axis.
-         * This is used by the ChartRow to match charts to this axis.
-         */
-        id: PropTypes.string.isRequired, // eslint-disable-line
-    
-        /**
-         * Show or hide this axis
-         */
-        visible: PropTypes.bool,
-    
-        /**
-         * The label to be displayed alongside the axis.
-         */
-        label: PropTypes.string,
-    
-        /**
-         * The scale type: linear, power, or log.
-         */
-        type: PropTypes.oneOf(["linear", "power", "log"]),
-    
-        /**
-         * Minimum value, which combined with "max", define the scale of the axis.
-         */
-        min: PropTypes.number.isRequired, // eslint-disable-line
-    
-        /**
-         * Maximum value, which combined with "min", define the scale of the axis.
-         */
-        max: PropTypes.number.isRequired, // eslint-disable-line
-    
-        /**
-         * A d3 scale for the y-axis which you can use to transform your data in the y direction.
-         * If omitted, the scale will be automatically computed based on the max and min props.
-         */
-        yScale: PropTypes.func,
-    
-        /**
-         * Render all ticks on the axis as positive values.
-         */
-        absolute: PropTypes.bool, // eslint-disable-line
-    
-        /**
-         * Object specifying the CSS by which the axis can be styled. The object can contain:
-         * "label", "values", "axis" and "ticks". Each of these is an inline CSS style applied
-         * to the axis label, axis values, axis line and ticks respectively.
-         *
-         * Note that these are passed into d3's styling, so are regular CSS property names
-         * and not React's camel case names (e.g. "stroke-dasharray" not strokeDasharray).
-         */
-        style: PropTypes.shape({
-            label: PropTypes.object, // eslint-disable-line
-            axis: PropTypes.object, // eslint-disable-line
-            values: PropTypes.object, // esline-disable-line
-            ticks: PropTypes.object // esline-disable-line
-        }),
-    
-        /**
-         * Render a horizontal grid by extending the axis ticks across the chart area. Note that this
-         * can only be applied to an inner axis (one next to a chart). If you have multiple axes then
-         * this can't be used on the outer axes. Also, if you have an axis on either side of the chart
-         * then you can use this, but the UX not be ideal.
-         */
-        showGrid: PropTypes.bool,
-    
-        /**
-         * Render the axis line. This is a nice option of you are also using `showGrid` as you may not
-         * want both the vertical axis line and the extended ticks.
-         */
-        hideAxisLine: PropTypes.bool,
-    
-        /**
-         * The transition time for moving from one scale to another
-         */
-        transition: PropTypes.number,
-    
-        /**
-         * The width of the axis
-         */
-        width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    
-        /**
-         * Offset the axis label from its default position. This allows you to
-         * fine tune the label location, which may be necessary depending on the
-         * scale and how much room the tick labels take up. Maybe positive or
-         * negative.
-         */
-        labelOffset: PropTypes.number,
-    
-        /**
-         * If a string, the d3.format for the axis labels (e.g. `format=\"$,.2f\"`).
-         * If a function, that function will be called with each tick value and
-         * should generate a formatted string for that value to be used as the label
-         * for that tick (e.g. `function (n) { return Number(n).toFixed(2) }`).
-         */
-        format: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-    
-        /**
-         * If the chart should be rendered to with the axis on the left or right.
-         * If you are using the axis in a ChartRow, you do not need to provide this.
-         */
-        align: PropTypes.string,
-    
-        /**
-         * [Internal] The scale supplied by the ChartRow
-         */
-        scale: PropTypes.func,
-    
-        /**
-         * [Internal] The height supplied by the surrounding ChartContainer
-         */
-        height: PropTypes.number,
-    
-        /**
-         * The number of ticks
-         */
-        tickCount: PropTypes.number
-    };
 }
