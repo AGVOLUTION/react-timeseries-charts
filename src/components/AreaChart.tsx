@@ -21,7 +21,7 @@ import { scaleAsString } from "../js/util";
 import { Styler } from "../js/styler";
 import curves from "../js/curve";
 
-const defaultStyle: any = {
+const defaultStyle = {
     line: {
         normal: { stroke: "steelblue", fill: "none", strokeWidth: 1 },
         highlighted: { stroke: "#5a98cb", fill: "none", strokeWidth: 1 },
@@ -284,7 +284,7 @@ export default class AreaChart<T extends Key> extends React.Component<AreaChartP
     }
 
     providedAreaStyleMap(column) {
-        let style = {};
+        let style = { line: {}, area: {} };
         if (this.props.style) {
             if (this.props.style instanceof Styler) {
                 style = this.props.style.areaChartStyle()[column];
@@ -373,7 +373,7 @@ export default class AreaChart<T extends Key> extends React.Component<AreaChartP
 
         const areaGenerator = area()
             .curve(curves[this.props.interpolation])
-            .x(d => d.x)
+            .x(d => d.x0)
             .y0(d => d.y0)
             .y1(d => d.y1);
 
@@ -384,8 +384,8 @@ export default class AreaChart<T extends Key> extends React.Component<AreaChartP
         // Outline the top of the curve
         const lineGenerator = line()
             .curve(curves[this.props.interpolation])
-            .x(d => d.x)
-            .y(d => d.y);
+            .x(d => d.x0)
+            .y(d => d.y1);
         const outlinePath = lineGenerator(data);
 
         return (

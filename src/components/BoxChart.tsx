@@ -12,11 +12,12 @@ import _ from "underscore";
 import merge from "merge";
 import React from "react";
 import PropTypes, { InferProps } from "prop-types";
-import { Event, timeEvent, indexedEvent, max, median, min, percentile, TimeSeries, Key } from "pondjs";
+import { Event, timeEvent, indexedEvent, max, median, min, percentile, TimeSeries, Key, Window, Duration, Time, TimeRange } from "pondjs";
 
 import EventMarker from "./EventMarker";
 import { Styler } from "../js/styler";
 import { scaleAsString } from "../js/util";
+import { AggregationSpec, ReducerFunction } from "pondjs/lib/types";
 
 const defaultFillStyle: any = {
     fill: "steelblue",
@@ -49,7 +50,7 @@ const defaultStyle = [
     }
 ];
 
-const defaultAggregation: any = {
+const defaultAggregation = {
     size: "5m",
     reducers: {
         outer: [min(), max()],
@@ -58,7 +59,7 @@ const defaultAggregation: any = {
     }
 };
 
-function getSeries(series, column) {
+function getSeries(series: TimeSeries<any>, column) {
     return series.map(e => {
         const v = e.get(column);
         const d: any = {};
@@ -96,34 +97,28 @@ function getSeries(series, column) {
     });
 }
 
-function getAggregatedSeries(series, column, aggregation = defaultAggregation) {
+function getAggregatedSeries<T extends Key>(series: TimeSeries<T>, column, aggregation = defaultAggregation) {
     const { size, reducers } = aggregation;
     const { inner, outer, center } = reducers;
 
-    function mapColumn(c, r) {
-        const obj: any = {};
-        obj[c] = r;
-        return obj;
-    }
-
-    const fixedWindowAggregation: any = {};
+    const fixedWindowAggregation: AggregationSpec<T>  = {};
 
     if (inner) {
-        fixedWindowAggregation.innerMin = mapColumn(column, inner[0]);
-        fixedWindowAggregation.innerMax = mapColumn(column, inner[1]);
+        fixedWindowAggregation.innerMin = [column, inner[0]];
+        fixedWindowAggregation.innerMax = [column, inner[1]];
     }
 
     if (outer) {
-        fixedWindowAggregation.outerMin = mapColumn(column, outer[0]);
-        fixedWindowAggregation.outerMax = mapColumn(column, outer[1]);
+        fixedWindowAggregation.outerMin = [column, outer[0]];
+        fixedWindowAggregation.outerMax = [column, outer[1]];
     }
 
     if (center) {
-        fixedWindowAggregation.center = mapColumn(column, center);
+        fixedWindowAggregation.center = [column, center];
     }
 
     const aggregatedSeries = series.fixedWindowRollup({
-        windowSize: size,
+        window: new Window(new Duration(size)),
         aggregation: fixedWindowAggregation
     });
 
@@ -131,6 +126,14 @@ function getAggregatedSeries(series, column, aggregation = defaultAggregation) {
 }
 
 type BoxChartProps<T extends Key> = {
+
+        /**
+         * Reference to the axis which provides the vertical scale for drawing.
+         * e.g. specifying `axis="trafficRate"` would refer the y-scale of the YAxis
+         * with id="trafficRate".
+         */
+         axis: string, // eslint-disable-line
+
         /**
          * Show or hide this chart
          */
@@ -179,9 +182,9 @@ type BoxChartProps<T extends Key> = {
         aggregation?: {
             size: string,
             reducers: {
-                inner: Function[], // eslint-disable-line
-                outer: Function[], // eslint-disable-line
-                center: Function // eslint-disable-line
+                inner: ReducerFunction[], // eslint-disable-line
+                outer: ReducerFunction[], // eslint-disable-line
+                center: ReducerFunction // eslint-disable-line
             }
         }, // eslint-disable-line
 
@@ -372,11 +375,11 @@ export default class BoxChart<T extends Key> extends React.Component<BoxChartPro
     highlightedStyle: any;
     mutedStyle: any;
     normalStyle: any[];
-    series: any;
-    constructor(props) {
+    series: TimeSeries<any>;
+    constructor(props: BoxChartProps<T>) {
         super(props);
         if (
-            props.series._collection._type === timeEvent // eslint-disable-line
+            props.series.atFirst()?.getKey() instanceof Time || props.series.atFirst()?.getKey() instanceof TimeRange
         ) {
             this.series = getAggregatedSeries(props.series, props.column, props.aggregation);
         } else {
@@ -521,7 +524,7 @@ export default class BoxChart<T extends Key> extends React.Component<BoxChartPro
             (!_.isArray(this.providedStyle) || this.providedStyle.length !== 3)
         ) {
             console.warn("Provided style to BoxChart should be an array of 3 objects");
-            return defaultStyle;
+            this.providedStyle = defaultStyle;
         }
 
         const isHighlighted = this.props.highlighted && Event.is(this.props.highlighted as any, event);
@@ -607,11 +610,11 @@ export default class BoxChart<T extends Key> extends React.Component<BoxChartPro
                 : null;
         };
 
-        for (const event of this.series.events()) {
+        for (const event of this.series.eventList()) {
             const index = event.index();
             const begin = event.begin();
             const end = event.end();
-            const d = event.data();
+            const d = event.getData();
 
             const beginPosInner = timeScale(begin) + innerSpacing;
             const endPosInner = timeScale(end) - innerSpacing;
@@ -746,7 +749,7 @@ export default class BoxChart<T extends Key> extends React.Component<BoxChartPro
                 const barCenterProps: any = {
                     key: keyCenter,
                     ...boxCenter,
-                    style: styles[level]
+                    style: styles[level].normal
                 };
                 if (this.props.onSelectionChange) {
                     barCenterProps.onClick = e => this.handleClick(e, event);
