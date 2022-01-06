@@ -18,7 +18,7 @@ import { timeFormat } from "d3-time-format";
 import Label from "./Label";
 import ValueList from "./ValueList";
 
-const EventTime = ({ time, format = "%m/%d/%y %X" }: { time: Date, format: string | Function}) => {
+const EventTime = ({ time, format = "%m/%d/%y %X" }: { time?: Date, format: string | Function}) => {
     const textStyle: any = {
         fontSize: 11,
         textAnchor: "left",
@@ -45,7 +45,7 @@ EventTime.defaultProps = {
     infoTimeFormat: "%m/%d/%y %X"
 };
 
-const EventTimeRange = ({ timerange, format = "%m/%d/%y %X" }: { timerange: TimeRange, format: string | Function }) => {
+const EventTimeRange = ({ timerange, format = "%m/%d/%y %X" }: { timerange?: TimeRange, format: string | Function }) => {
     const textStyle: any = {
         fontSize: 11,
         textAnchor: "left",
@@ -74,16 +74,11 @@ const EventTimeRange = ({ timerange, format = "%m/%d/%y %X" }: { timerange: Time
     );
 };
 
-EventTimeRange.propTypes = {
-    timerange: TimeRange,
-    format: PropTypes.any
-};
-
 EventTimeRange.defaultProps = {
     infoTimeFormat: "%m/%d/%y %X"
 };
 
-const EventIndex = ({ index, format }) => {
+const EventIndex = ({ index, format }: { index?: Index, format?: string | Function }) => {
     const textStyle: any = {
         fontSize: 11,
         textAnchor: "left",
@@ -108,18 +103,13 @@ const EventIndex = ({ index, format }) => {
     );
 };
 
-EventIndex.propTypes = {
-    index: Index,
-    format: PropTypes.any
-};
-
 type EventMarkerProps = Partial<{
-        type: "point" | "flag",
+        type?: "point" | "flag",
 
         /**
          * What [Pond Event](https://esnet-pondjs.appspot.com/#/event) to mark
          */
-        event: Event,
+        event?: Event,
 
         /**
          * Which column in the Event to use
@@ -128,7 +118,7 @@ type EventMarkerProps = Partial<{
          * represent a path to deep data in the underlying events
          * (i.e. reference into nested data structures)
          */
-        column: string,
+        column?: string,
 
         /**
          * The values to show in the info box. This is either an array of
@@ -136,7 +126,7 @@ type EventMarkerProps = Partial<{
          * to be shown in the info box, or a simple string label. If this
          * prop is not supplied, no infoBox will be displayed.
          */
-        info: string | {
+        info?: string | {
             label: string, // eslint-disable-line
             value: string // eslint-disable-line
         }[],
@@ -145,17 +135,17 @@ type EventMarkerProps = Partial<{
          * The style of the info box itself. Typically you'd want to
          * specify a fill color, and stroke color/width here.
          */
-        infoStyle: object,
+        infoStyle?: object,
 
         /**
          * The width of the info box
          */
-        infoWidth: number,
+        infoWidth?: number,
 
         /**
          * The height of the info box
          */
-        infoHeight: number,
+        infoHeight?: number,
 
         /**
          * Alter the format of the timestamp shown on the info box.
@@ -167,64 +157,64 @@ type EventMarkerProps = Partial<{
          * Alternatively you can pass in a d3 format string. That will be applied
          * to the begin time of the Index range.
          */
-        infoTimeFormat: string | Function,
+        infoTimeFormat?: string | Function,
 
         /**
          * Show a label to the left or right of the marker
          */
-        markerLabelAlign: "left" | "right" | "top" | "bottom",
-        markerLabel: string,
-        markerLabelStyle: object,
+        markerLabelAlign?: "left" | "right" | "top" | "bottom",
+        markerLabel?: string,
+        markerLabelStyle?: object,
 
-        marker: string,
+        marker?: string,
         /**
          * The radius of the dot at the end of the marker
          */
-        markerRadius: number,
+        markerRadius?: number,
 
         /**
          * The style of the event marker dot
          */
-        markerStyle: object,
+        markerStyle?: object,
 
         /**
          * The y value is calculated by the column and event, but if
          * this prop is provided this will be used instead.
          */
-        yValueFunc: Function,
+        yValueFunc?: Function,
 
         /**
          * Offset the marker position in the x direction.
          */
-        offsetX: number,
+        offsetX?: number,
 
         /**
          * Offset the marker position in the y direction
          */
-        offsetY: number,
+        offsetY?: number,
 
         /**
          * The vertical offset in pixels of the EventMarker info box from the
          * top of the chart. The default is 20.
          */
-        infoOffsetY: number,
+        infoOffsetY?: number,
 
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: Function,
+        timeScale?: Function,
 
         /**
          * [Internal] The yScale supplied by the associated YAxis
          */
-        yScale: Function,
+        yScale?: Function,
 
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: number,
+        width?: number,
 
-        stemStyle: object,
+        stemStyle?: object,
     }>;
 
 /**

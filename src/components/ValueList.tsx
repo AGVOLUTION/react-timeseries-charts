@@ -47,7 +47,7 @@ type ValueListProps = {
     /**
      * Where to position the label, either "left" or "center" within the box
      */
-    align: "center" | "left",
+    align?: "center" | "left",
 
     /**
      * An array of label value pairs to render
@@ -60,17 +60,17 @@ type ValueListProps = {
     /**
      * CSS object to be applied to the ValueList surrounding box and the label (text).
      */
-    style: object, // eslint-disable-line
+    style?: object, // eslint-disable-line
 
     /**
      * The width of the rectangle to render into
      */
-    width: number,
+    width?: number,
 
     /**
      * The height of the rectangle to render into
      */
-    height: number
+    height?: number
 }
 
 /**

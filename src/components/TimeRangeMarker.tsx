@@ -29,7 +29,7 @@ type TimeRangeMarkerProps = {
          * The style of the rect that will be rendered as a SVG <Rect>. This
          * object is the inline CSS for that rect.
          */
-        style: object, // eslint-disable-line
+        style?: object, // eslint-disable-line
 
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer

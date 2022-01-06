@@ -15,77 +15,77 @@ import PropTypes, { InferProps } from "prop-types";
 import { TimeSeries, Event, Key } from "pondjs";
 
 type EventChartProps<T extends Key> = {
-        /**
-         * Show or hide this chart
-         */
-        visible?: boolean,
+    /**
+     * Show or hide this chart
+     */
+    visible?: boolean,
 
-        /**
-         * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
-         */
-        series: TimeSeries<T>,
+    /**
+     * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
+     */
+    series: TimeSeries<T>,
 
-        /**
-         * Set hover label text
-         * When label is function callback it will be called with current event.
-         */
-        label: string | Function,
+    /**
+     * Set hover label text
+     * When label is function callback it will be called with current event.
+     */
+    label?: string | Function,
 
-        /**
-         * The height in pixels for the event bar
-         */
-        size: number,
+    /**
+     * The height in pixels for the event bar
+     */
+    size?: number,
 
-        /**
-         * The distance in pixels to inset the event bar from its actual timerange
-         */
-        spacing: number,
+    /**
+     * The distance in pixels to inset the event bar from its actual timerange
+     */
+    spacing?: number,
 
-        /**
-         * Marker width on hover
-         */
-        hoverMarkerWidth: number,
+    /**
+     * Marker width on hover
+     */
+    hoverMarkerWidth?: number,
 
-        /**
-         * Hover text offset position X
-         */
-        textOffsetX: number,
+    /**
+     * Hover text offset position X
+     */
+    textOffsetX?: number,
 
-        /**
-         * Hover text offset position Y
-         */
-        textOffsetY: number,
+    /**
+     * Hover text offset position Y
+     */
+    textOffsetY?: number,
 
-        /**
-         * A function that should return the style of the event box
-         */
-        style: Function,
+    /**
+     * A function that should return the style of the event box
+     */
+    style?: Function,
 
-        /**
-         * Event selection on click. Will be called with selected event.
-         */
-        onSelectionChange: Function,
+    /**
+     * Event selection on click. Will be called with selected event.
+     */
+    onSelectionChange?: Function,
 
-        /**
-         * Mouse leave at end of hover event
-         */
-        onMouseLeave: Function,
+    /**
+     * Mouse leave at end of hover event
+     */
+    onMouseLeave?: Function,
 
-        /**
-         * Mouse over event callback
-         */
-        onMouseOver: Function,
+    /**
+     * Mouse over event callback
+     */
+    onMouseOver?: Function,
 
-        /**
-         * [Internal] The timeScale supplied by the surrounding ChartContainer
-         */
-        timeScale: Function,
+    /**
+     * [Internal] The timeScale supplied by the surrounding ChartContainer
+     */
+    timeScale?: Function,
 
-        /**
-         * [Internal] The width supplied by the surrounding ChartContainer
-         */
-        width: number
-    }
+    /**
+     * [Internal] The width supplied by the surrounding ChartContainer
+     */
+    width?: number
+}
 
 /**
  * Renders an event view that shows the supplied set of events along a time axis.

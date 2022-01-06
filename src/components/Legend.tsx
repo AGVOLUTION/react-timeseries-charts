@@ -262,14 +262,14 @@ type LegendProps = {
          * The overall style of the legend items, either a color "swatch", a
          * colored "line", or a "dot".
          */
-        type: "swatch" | "line" | "dot",
+        type?: "swatch" | "line" | "dot",
 
         /**
          * Alignment of the legend within the available space. Either left or right.
          */
-        align: "left" | "right",
+        align?: "left" | "right",
 
-        style: object | Function | Styler,
+        style?: object | Function | Styler,
 
         /**
          * The categories array specifies details and style for each item in the legend. For each item:
@@ -293,43 +293,43 @@ type LegendProps = {
             key: string, // eslint-disable-line
             label: string, // eslint-disable-line
             disabled?: boolean, // eslint-disable-line
-            style: object, // eslint-disable-line
-            labelStyle: object, // eslint-disable-line
-            value: any, // eslint-disable-line
-            symbolType: any, // eslint-disable-line
+            style?: object, // eslint-disable-line
+            labelStyle?: object, // eslint-disable-line
+            value?: any, // eslint-disable-line
+            symbolType?: any, // eslint-disable-line
         }[],
 
         /**
          * The width of the legend symbol
          */
-        symbolWidth: number,
+        symbolWidth?: number,
 
         /**
          * The height of the legend symbol
          */
-        symbolHeight: number,
+        symbolHeight?: number,
 
         /**
          * Which item, specified by its key, should be rendered as highlighted
          */
-        highlight: string,
+        highlight?: string,
 
         /**
          * Which item, specified by its key, should be rendered as selected
          */
-        selection: string,
+        selection?: string,
 
         /**
          * Callback will be called with a legend item is selected (i.e. it is clicked
          * on by the user)
          */
-        onSelectionChange: Function,
+        onSelectionChange?: Function,
 
         /**
          * Callback will be called with a legend item is highlighted (i.e. it is hovered
          * over by the user)
          */
-        onHighlightChange: Function,
+        onHighlightChange?: Function,
 
         /**
          * Defines whether to stack legend items vertically or not
@@ -339,7 +339,7 @@ type LegendProps = {
         /**
          * The margin at the bottom. Default value is 20px
          */
-        marginBottom: string
+        marginBottom?: string
     };
 
 export default class Legend extends React.Component<LegendProps> {

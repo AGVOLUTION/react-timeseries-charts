@@ -45,7 +45,7 @@ type BaselineProps = {
          * { label, line }. "label" and "line" are both objects containing
          * the inline CSS for that part of the baseline.
          */
-        style: {
+        style?: {
             label: object, // eslint-disable-line
             line: object // eslint-disable-line
         },
@@ -53,34 +53,34 @@ type BaselineProps = {
         /**
          * The y-value to display the line at.
          */
-        value: number,
+        value?: number,
 
         /**
          * The label to display with the axis.
          */
-        label: string,
+        label?: string,
 
         /**
          * Whether to display the label on the "left" or "right".
          */
-        position: "left" | "right",
+        position?: "left" | "right",
 
         /**
          * Whether to display the label above or below the line. The default is "auto",
          * which will show it above the line unless the position is near to the top
          * of the chart.
          */
-        vposition: "above" | "below" | "auto",
+        vposition?: "above" | "below" | "auto",
 
         /**
          * [Internal] The yScale supplied by the associated YAxis
          */
-        yScale: Function,
+        yScale?: Function,
 
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: number
+        width?: number
     }
 
 /**

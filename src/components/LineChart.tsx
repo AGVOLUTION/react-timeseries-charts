@@ -51,7 +51,7 @@ type LineChartProps<T extends Key> = {
          * represent a path to deep data in the underlying events 
          * (i.e. reference into nested data structures)
          */
-        columns: string[],
+        columns?: string[],
     
         /**
          * The styles to apply to the underlying SVG lines. This is a mapping
@@ -86,12 +86,12 @@ type LineChartProps<T extends Key> = {
          *
          * ```
          */
-        style: object | Function | Styler,
+        style?: object | Function | Styler,
     
         /**
          * Any of D3's interpolation modes.
          */
-        interpolation: D3interpolation,
+        interpolation?: D3interpolation,
     
         /**
          * The determines how to handle bad/missing values in the supplied
@@ -108,41 +108,41 @@ type LineChartProps<T extends Key> = {
          *
          * See also `onSelectionChange`
          */
-        selection: string,
+        selection?: string,
     
         /**
          * A callback that will be called when the selection changes. It will be called
          * with the column corresponding to the line being clicked.
          */
-        onSelectionChange: Function,
+        onSelectionChange?: Function,
     
         /**
          * The highlighted column, which will be rendered in the "highlighted" style.
          *
          * See also `onHighlightChange`
          */
-        highlight: string,
+        highlight?: string,
     
         /**
          * A callback that will be called when the hovered over line changes.
          * It will be called with the corresponding column.
          */
-        onHighlightChange: Function,
+        onHighlightChange?: Function,
     
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: Function,
+        timeScale?: Function,
     
         /**
          * [Internal] The yScale supplied by the associated YAxis
          */
-        yScale: Function,
+        yScale?: Function,
     
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: number
+        width?: number
     };
 
 /**

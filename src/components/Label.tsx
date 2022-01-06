@@ -56,7 +56,7 @@ const Label = ({ label, style, align, width, height }: {
     /**
      * Where to position the label, either "left" or "center" within the box
      */
-    align: "center" | "left",
+    align?: "center" | "left",
 
     /**
      * The label to render
@@ -67,17 +67,17 @@ const Label = ({ label, style, align, width, height }: {
      * The style of the label. This is the inline CSS applied directly
      * to the label box
      */
-    style: object, // eslint-disable-line
+    style?: object, // eslint-disable-line
 
     /**
      * The width of the rectangle to render into
      */
-    width: number,
+    width?: number,
 
     /**
      * The height of the rectangle to render into
      */
-    height: number
+    height?: number
 }) => {
     const { boxStyle, labelStyle } = mergeStyles(style, align === "center");
 

@@ -39,19 +39,19 @@ type BarChartProps<T extends Key> = {
         /**
          * The distance in pixels to inset the bar chart from its actual timerange
          */
-        spacing: number,
+        spacing?: number,
 
         /**
          * The distance in pixels to offset the bar from its center position within the timerange
          * it represents
          */
-        offset: number,
+        offset?: number,
 
         /**
          * The minimum height of a bar given in pixels.
          * By default, the minimum height of a bar is 1 pixel
          */
-        minBarHeight: number,
+        minBarHeight?: number,
 
         /**
          * A list of columns within the series that will be stacked on top of each other
@@ -60,7 +60,7 @@ type BarChartProps<T extends Key> = {
          * represent a path to deep data in the underlying events
          * (i.e. reference into nested data structures)
          */
-        columns: string[],
+        columns?: string[],
 
         /**
          * When true, the entire `highlighted` event will be highlighted, instead of
@@ -105,14 +105,14 @@ type BarChartProps<T extends Key> = {
          * four states (normal, highlighted, selected and muted) and the corresponding
          * CSS properties.
          */
-        style: object | Function | Styler,
+        style?: object | Function | Styler,
 
         /**
          * The values to show in the info box. This is an array of
          * objects, with each object specifying the label and value
          * to be shown in the info box.
          */
-        info: {
+        info?: {
                 label: string, //eslint-disable-line
                 value: string //eslint-disable-line
             }[],
@@ -121,23 +121,23 @@ type BarChartProps<T extends Key> = {
          * The style of the info box itself. Typically you'd want to
          * specify a fill color, and stroke color / width here.
          */
-        infoStyle: object, //eslint-disable-line
+        infoStyle?: object, //eslint-disable-line
 
         /**
          * The width of the info box
          */
-        infoWidth: number, //eslint-disable-line
+        infoWidth?: number, //eslint-disable-line
 
         /**
          * The height of the info box
          */
-        infoHeight: number, //eslint-disable-line
+        infoHeight?: number, //eslint-disable-line
 
         /**
          * The vertical offset in pixels of the EventMarker info box from the
          * top of the chart.
          */
-        infoOffsetY: number,
+        infoOffsetY?: number,
 
         /**
          * Alter the format of the timestamp shown on the info box.
@@ -149,23 +149,23 @@ type BarChartProps<T extends Key> = {
          * Alternatively you can pass in a d3 format string. That will be applied
          * to the begin time of the Index range.
          */
-        infoTimeFormat: string | Function,
+        infoTimeFormat?: string | Function,
 
         /**
          * The radius of the infoBox dot at the end of the marker
          */
-        markerRadius: number,
+        markerRadius?: number,
 
         /**
          * The style of the infoBox dot at the end of the marker
          */
-        markerStyle: object,
+        markerStyle?: object,
 
         /**
          * If size is specified, then the bar will be this number of pixels wide. This
          * prop takes priority over "spacing".
          */
-        size: number,
+        size?: number,
 
         /**
          * The selected item, which will be rendered in the "selected" style.
@@ -173,7 +173,7 @@ type BarChartProps<T extends Key> = {
          *
          * See also `onSelectionChange`
          */
-        selected: {
+        selected?: {
             event: Event,
             column: string
         },
@@ -182,14 +182,14 @@ type BarChartProps<T extends Key> = {
          * A callback that will be called when the selection changes. It will be called
          * with an object containing the event and column.
          */
-        onSelectionChange: Function,
+        onSelectionChange?: Function,
 
         /**
          * The highlighted item, which will be rendered in the "highlighted" style.
          *
          * See also `onHighlightChange`
          */
-        highlighted: {
+        highlighted?: {
             event: Event,
             column: string
         },
@@ -198,17 +198,17 @@ type BarChartProps<T extends Key> = {
          * A callback that will be called when the hovered over bar changes.
          * It will be called with an object containing the event and column.
          */
-        onHighlightChange: Function,
+        onHighlightChange?: Function,
 
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: Function,
+        timeScale?: Function,
 
         /**
          * [Internal] The yScale supplied by the associated YAxis
          */
-        yScale: Function
+        yScale?: Function
     }
 
 /**

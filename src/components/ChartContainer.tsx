@@ -89,19 +89,19 @@ type ChartContainerProps = {
          * surrounding element. This is very handy when you need the chart to resize
          * based on a responsive layout.
          */
-        width: number,
+        width?: number,
 
         /**
          * Constrain the timerange to not move back in time further than this Date.
          */
-        minTime: Date,
+        minTime?: Date,
 
         /**
          * Constrain the timerange to not move forward in time than this Date. A
          * common example is setting this to the current time or the end time
          * of a fixed set of data.
          */
-        maxTime: Date,
+        maxTime?: Date,
 
         /**
          * Boolean to turn on interactive pan and zoom behavior for the chart.
@@ -118,7 +118,7 @@ type ChartContainerProps = {
          * than this duration, in milliseconds. This might be determined by the
          * resolution of your data.
          */
-        minDuration: number,
+        minDuration?: number,
 
         /**
          * Provides several options as to the format of the time axis labels.
@@ -142,15 +142,15 @@ type ChartContainerProps = {
          *  - supplying a function for format will cause that function to be called
          * whenever rendering a time
          */
-        format: string | Function,
+        format?: string | Function,
 
         /**
          * Time in milliseconds to transition from one Y-scale to the next
          */
-        transition: number,
+        transition?: number,
 
-        scale: ScaleTime<any, any>,
-        onMouseMove: Function,
+        scale?: ScaleTime<any, any>,
+        onMouseMove?: Function,
 
         /**
          * Show grid lines for each time marker
@@ -161,22 +161,22 @@ type ChartContainerProps = {
          * Defines whether grid is overlayed ("over"( or underlayed ("under")
          * with respect to the charts
          */
-        showGridPosition: "over" | "under",
+        showGridPosition?: "over" | "under",
 
         /**
          * Defines how to style the SVG
          */
-        style: object,
+        style?: object,
 
         /**
          * The width of the tracker info box
          */
-        trackerHintWidth: number,
+        trackerHintWidth?: number,
 
         /**
          * The height of the tracker info box
          */
-        trackerHintHeight: number,
+        trackerHintHeight?: number,
 
         /**
          * Info box value or values to place next to the tracker line.
@@ -184,7 +184,7 @@ type ChartContainerProps = {
          * specifying the label and value to be shown in the info box,
          * or a simple string label.
          */
-        trackerValues: string | {
+        trackerValues?: string | {
             label: string,
             value: string
         }[],
@@ -195,7 +195,7 @@ type ChartContainerProps = {
          * followers the user's cursor, but it could be modified to snap to a point or
          * to the nearest minute, for example.
          */
-        trackerPosition: Date,
+        trackerPosition?: Date,
 
         /**
          * The style of the time marker. This is an object of the form { line, box, dot }.
@@ -204,7 +204,7 @@ type ChartContainerProps = {
          *
          * When we use the TimeMarker as a tracker, we can style the box and dot as well.
          */
-        trackerStyle: {
+        trackerStyle?: {
             label: object, // eslint-disable-line
             line: object, // eslint-disable-line
             box: object, // eslint-disable-line
@@ -228,7 +228,7 @@ type ChartContainerProps = {
          *     ... />
          * ```
          */
-        onTrackerChanged: Function,
+        onTrackerChanged?: Function,
 
         /**
          * This will be called if the user pans and/or zooms the chart. The callback
@@ -242,48 +242,48 @@ type ChartContainerProps = {
          *     ... />
          * ```
          */
-        onTimeRangeChanged: Function,
+        onTimeRangeChanged?: Function,
 
         /**
          * Called when the size of the chart changes
          */
-        onChartResize: Function,
+        onChartResize?: Function,
 
         /**
          * Called when the user clicks the background plane of the chart. This is
          * useful when deselecting elements.
          */
-        onBackgroundClick: Function,
+        onBackgroundClick?: Function,
 
         /**
          * Called when the user context-clicks the chart
          */
-        onContextMenu: Function,
+        onContextMenu?: Function,
 
         /**
          * Props for handling the padding
          */
-        padding: number,
-        paddingLeft: number,
-        paddingRight: number,
-        paddingTop: number,
-        paddingBottom: number,
+        padding?: number,
+        paddingLeft?: number,
+        paddingRight?: number,
+        paddingTop?: number,
+        paddingBottom?: number,
 
         /**
          * Specify the title for the chart
          */
-        title: string,
+        title?: string,
 
         /**
          * Specify the height of the title
          * Default value is 28 pixels
          */
-        titleHeight: number,
+        titleHeight?: number,
 
         /**
          * Specify the styling of the chart's title
          */
-        titleStyle: object,
+        titleStyle?: object,
 
         /**
          * Object specifying the CSS by which the `TimeAxis` can be styled. The object can contain:
@@ -296,7 +296,7 @@ type ChartContainerProps = {
          * and not React's camel case names (e.g. "stroke-dasharray" not "strokeDasharray"). "axis" is a
          * regular React rendered SVG line, so it uses camel case.
          */
-        timeAxisStyle: {
+        timeAxisStyle?: {
             axis: object,
             values: object,
             ticks: object
@@ -306,14 +306,14 @@ type ChartContainerProps = {
          * Height of the time axis
          * Default value is 35 pixels
          */
-        timeAxisHeight: number,
+        timeAxisHeight?: number,
 
         /**
          * Specify the number of ticks
          * The default ticks for quantitative scales are multiples of 2, 5 and 10.
          * So, while you can use this prop to increase or decrease the tick count, it will always return multiples of 2, 5 and 10.
          */
-        timeAxisTickCount: number,
+        timeAxisTickCount?: number,
 
         /**
          * Angle the time axis labels
@@ -323,7 +323,7 @@ type ChartContainerProps = {
         /**
          * Prop to hide time axis if required
          */
-        hideTimeAxis: boolean
+        hideTimeAxis?: boolean
     };
 
 /**

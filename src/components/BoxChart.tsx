@@ -150,7 +150,7 @@ type BoxChartProps<T extends Key> = {
          * represent a path to deep data in the underlying events
          * (i.e. reference into nested data structures)
          */
-        column: string,
+        column?: string,
 
         /**
          * The aggregation specification. This object should contain:
@@ -176,7 +176,7 @@ type BoxChartProps<T extends Key> = {
          *     }
          * ```
          */
-        aggregation: {
+        aggregation?: {
             size: string,
             reducers: {
                 inner: Function[], // eslint-disable-line
@@ -190,35 +190,35 @@ type BoxChartProps<T extends Key> = {
          * a styler object. It is recommended to user the styler unless you need
          * detailed customization.
          */
-        style: object | Function | Styler,
+        style?: object | Function | Styler,
 
         /**
          * The style of the info box and connecting lines
          */
-        infoStyle: object, //eslint-disable-line
+        infoStyle?: object, //eslint-disable-line
 
         /**
          * The width of the hover info box
          */
-        infoWidth: number, //eslint-disable-line
+        infoWidth?: number, //eslint-disable-line
 
         /**
          * The height of the hover info box
          */
-        infoHeight: number, //eslint-disable-line
+        infoHeight?: number, //eslint-disable-line
 
         /**
          * The vertical offset in pixels of the EventMarker info box from the
          * top of the chart.
          */
-        infoOffsetY: number,
+        infoOffsetY?: number,
 
         /**
          * The values to show in the info box. This is an array of
          * objects, with each object specifying the label and value
          * to be shown in the info box.
          */
-        info:            {
+        info?:            {
                 //eslint-disable-line
                 label: string, //eslint-disable-line
                 value: string //eslint-disable-line
@@ -230,7 +230,7 @@ type BoxChartProps<T extends Key> = {
          * the boxes from each other. Inner and outer boxes are controlled
          * separately.
          */
-        innerSpacing: number,
+        innerSpacing?: number,
 
         /**
          * If spacing is specified, then the boxes will be separated from the
@@ -238,19 +238,19 @@ type BoxChartProps<T extends Key> = {
          * the boxes from each other. Inner and outer boxes are controlled
          * separately.
          */
-        outerSpacing: number,
+        outerSpacing?: number,
 
         /**
          * If size is specified, then the innerBox will be this number of pixels wide. This
          * prop takes priority over "spacing".
          */
-        innerSize: number,
+        innerSize?: number,
 
         /**
          * If size is specified, then the outer box will be this number of pixels wide. This
          * prop takes priority over "spacing".
          */
-        outerSize: number,
+        outerSize?: number,
 
         /**
          * The selected item, which will be rendered in the "selected" style.
@@ -258,41 +258,41 @@ type BoxChartProps<T extends Key> = {
          *
          * See also `onSelectionChange`
          */
-        selected: Event,
+        selected?: Event,
 
         /**
          * The highlighted item, which will be rendered in the "highlighted" style.
          *
          * See also `onHighlightChange`
          */
-        highlighted: Event,
+        highlighted?: Event,
 
         /**
          * A callback that will be called when the selection changes. It will be called
          * with the event corresponding to the box clicked as its only arg.
          */
-        onSelectionChange: Function,
+        onSelectionChange?: Function,
 
         /**
          * A callback that will be called when the hovered over box changes.
          * It will be called with the event corresponding to the box hovered over.
          */
-        onHighlightChange: Function,
+        onHighlightChange?: Function,
 
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: Function,
+        timeScale?: Function,
 
         /**
          * [Internal] The yScale supplied by the associated YAxis
          */
-        yScale: Function,
+        yScale?: Function,
 
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: number
+        width?: number
     }
 
 /**

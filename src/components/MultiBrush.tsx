@@ -26,7 +26,7 @@ type MultiBrushProps = {
          *
          * Takes an array of Pond TimeRange object.
          */
-        timeRanges: TimeRange[],
+        timeRanges?: TimeRange[],
 
         /**
          * The brush is rendered as an SVG rect. You can specify the style
@@ -34,12 +34,12 @@ type MultiBrushProps = {
          * provide. It will be called with the index of the TimeRange, corresponding
          * to those in the `timeRanges` prop.
          */
-        style: Function, //eslint-disable-line
+        style?: Function, //eslint-disable-line
 
         /**
          * The size of the invisible side handles. Defaults to 6 pixels.
          */
-        handleSize: number,
+        handleSize?: number,
 
         /**
          * If this prop is false, you will only be able to draw a new brush if the last position of the timeRanges
@@ -53,32 +53,32 @@ type MultiBrushProps = {
          * the user. It is called with a Pond TimeRange object and the index position of
          * the brush in the timeRanges prop.
          */
-        onTimeRangeChanged: Function,
+        onTimeRangeChanged?: Function,
 
         /**
          * when user stop drawing or dragging box
          */
-        onUserMouseUp: Function,
+        onUserMouseUp?: Function,
 
         /**
          * When the user clicks one of the TimeRanges
          */
-        onTimeRangeClicked: Function,
+        onTimeRangeClicked?: Function,
 
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: ScaleTime<any, any>,
+        timeScale?: ScaleTime<any, any>,
 
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: number,
+        width?: number,
 
         /**
          * [Internal] The height supplied by the surrounding ChartContainer
          */
-        height: number
+        height?: number
     };
 
 /**

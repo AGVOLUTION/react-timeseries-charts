@@ -52,8 +52,8 @@ const defaultStyle: any = {
 
 type YAxisProps = {
 
-        isInnerAxis: boolean,
-        chartExtent: any,
+        isInnerAxis?: boolean,
+        chartExtent?: any,
         
         /**
          * A name for the axis which can be used by a chart to reference the axis.
@@ -69,12 +69,12 @@ type YAxisProps = {
         /**
          * The label to be displayed alongside the axis.
          */
-        label: string,
+        label?: string,
     
         /**
          * The scale type: linear, power, or log.
          */
-        type: "linear" | "power" | "log",
+        type?: "linear" | "power" | "log",
     
         /**
          * Minimum value, which combined with "max", define the scale of the axis.
@@ -90,7 +90,7 @@ type YAxisProps = {
          * A d3 scale for the y-axis which you can use to transform your data in the y direction.
          * If omitted, the scale will be automatically computed based on the max and min props.
          */
-        yScale: Function,
+        yScale?: Function,
     
         /**
          * Render all ticks on the axis as positive values.
@@ -105,7 +105,7 @@ type YAxisProps = {
          * Note that these are passed into d3's styling, so are regular CSS property names
          * and not React's camel case names (e.g. "stroke-dasharray" not strokeDasharray).
          */
-        style: {
+        style?: {
             label: object, // eslint-disable-line
             axis: object, // eslint-disable-line
             values: object, // esline-disable-line
@@ -129,12 +129,12 @@ type YAxisProps = {
         /**
          * The transition time for moving from one scale to another
          */
-        transition: number,
+        transition?: number,
     
         /**
          * The width of the axis
          */
-        width: string | number
+        width?: string | number
     
         /**
          * Offset the axis label from its default position. This allows you to
@@ -142,7 +142,7 @@ type YAxisProps = {
          * scale and how much room the tick labels take up. Maybe positive or
          * negative.
          */
-        labelOffset: number,
+        labelOffset?: number,
     
         /**
          * If a string, the d3.format for the axis labels (e.g. `format=\"$,.2f\"`).
@@ -150,28 +150,28 @@ type YAxisProps = {
          * should generate a formatted string for that value to be used as the label
          * for that tick (e.g. `function (n) { return Number(n).toFixed(2) }`).
          */
-        format: string | Function,
+        format?: string | Function,
     
         /**
          * If the chart should be rendered to with the axis on the left or right.
          * If you are using the axis in a ChartRow, you do not need to provide this.
          */
-        align: string,
+        align?: string,
     
         /**
          * [Internal] The scale supplied by the ChartRow
          */
-        scale: Function,
+        scale?: Function,
     
         /**
          * [Internal] The height supplied by the surrounding ChartContainer
          */
-        height: number,
+        height?: number,
     
         /**
          * The number of ticks
          */
-        tickCount: number
+        tickCount?: number
     };
 
 /**

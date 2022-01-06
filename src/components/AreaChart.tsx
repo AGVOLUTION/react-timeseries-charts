@@ -67,7 +67,7 @@ type AreaChartProps<T extends Key> = {
          * represent a path to deep data in the underlying events 
          * (i.e. reference into nested data structures)
          */
-        columns: {
+        columns?: {
             up: string[],
             down: string[]
         },
@@ -118,47 +118,47 @@ type AreaChartProps<T extends Key> = {
          *
          * ```
          */
-        style: object | Function | Styler,
+        style?: object | Function | Styler,
 
         /**
          * Any of D3's interpolation modes.
          */
-        interpolation: D3interpolation
+        interpolation?: D3interpolation
 
         /**
          * The currenly highlighted column
          */
-        highlight: string,
+        highlight?: string,
 
         /**
          * Callback called when the highlight changes, i.e. hover event
          */
-        onHighlightChange: Function,
+        onHighlightChange?: Function,
 
         /**
          * The currenly selected column
          */
-        selection: string,
+        selection?: string,
 
         /**
          * Callback called when the selection changes, i.e. area is clicked
          */
-        onSelectionChange: Function,
+        onSelectionChange?: Function,
 
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: Function,
+        timeScale?: Function,
 
         /**
          * [Internal] The yScale supplied by the associated YAxis
          */
-        yScale: Function,
+        yScale?: Function,
 
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: number,
+        width?: number,
 
         /**
          * The determines how to handle bad/missing values in the supplied
@@ -167,7 +167,7 @@ type AreaChartProps<T extends Key> = {
          * the bad value(s). If breakArea is false (the default) bad values
          * are simply removed and the adjoining points are connected.
          */
-        breakArea: boolean
+        breakArea?: boolean
     }
 
 /**

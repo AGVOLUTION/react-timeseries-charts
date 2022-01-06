@@ -51,13 +51,13 @@ type ChartRowProps = {
         /**
          * The height of the row.
          */
-        height: string | number,
+        height?: string | number,
 
         /**
          * The vertical margin between the top and bottom of the row
          * height and the top and bottom of the range of the chart.
          */
-        axisMargin: number,
+        axisMargin?: number,
 
         /**
          * Show or hide this row
@@ -72,17 +72,17 @@ type ChartRowProps = {
         /**
          * The width of the tracker info box
          */
-        trackerInfoWidth: number,
+        trackerInfoWidth?: number,
 
         /**
          * The height of the tracker info box
          */
-        trackerInfoHeight: number,
+        trackerInfoHeight?: number,
 
-        trackerStyle: object,
+        trackerStyle?: object,
 
-        paddingLeft: number,
-        paddingRight: number,
+        paddingLeft?: number,
+        paddingRight?: number,
 
 
         /**
@@ -91,7 +91,7 @@ type ChartRowProps = {
          * specifying the label (a string) and value (also a string)
          * to be shown in the info box, or a simple string label.
          */
-        trackerInfoValues: string | {
+        trackerInfoValues?: string | {
             label: string, // eslint-disable-line
             value: string // eslint-disable-line
         }[],
@@ -99,31 +99,31 @@ type ChartRowProps = {
         /**
          * Specify the title for the chart row
          */
-        title: string,
+        title?: string,
 
         /**
          * Specify the height of the title
          * Default value is 28 pixels
          */
-        titleHeight: number,
+        titleHeight?: number,
 
         /**
          * Specify the styling of the chart row's title
          */
-        titleStyle: object,
+        titleStyle?: object,
 
         /**
          * Specify the styling of the box behind chart row's title
          */
-        titleBoxStyle: object,
+        titleBoxStyle?: object,
 
-        leftAxisWidths: number[],
-        rightAxisWidths: number[],
-        width: number,
-        timeScale: Function,
-        trackerTimeFormat: string | Function,
-        timeFormat: string | Function,
-        trackerTime: Date
+        leftAxisWidths?: number[],
+        rightAxisWidths?: number[],
+        width?: number,
+        timeScale?: Function,
+        trackerTimeFormat?: string | Function,
+        timeFormat?: string | Function,
+        trackerTime?: Date
     }
 
 /**

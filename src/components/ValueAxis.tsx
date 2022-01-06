@@ -34,23 +34,23 @@ const ValueAxis = ({ width, height, value, detail }: {
     /**
      * If values are numbers, use this format string
      */
-    value: string | number
+    value?: string | number
 
     /**
      * Use this to show what units are being used. It will appear below
      * the value.
      */
-    detail: string,
+    detail?: string,
 
     /**
      * The width of the axis
      */
-    width: number,
+    width?: number,
 
     /**
      * [Internal] The height of the axis
      */
-    height: number
+    height?: number
 }) => {
     const labelStyle: any = {
         fill: "#666",

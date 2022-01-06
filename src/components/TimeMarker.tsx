@@ -28,14 +28,14 @@ type TimeMarkerProps = {
         /**
          * The time, expressed as a Javascript `Date` object, to display the marker
          */
-        time: Date,
+        time?: Date,
 
         /**
          * The values to show in the info box. This is either an array of
          * objects, with each object specifying the label and value
          * to be shown in the info box, or a simple string label
          */
-        infoValues: string | {
+        infoValues?: string | {
             label: string, // eslint-disable-line
             value: string // eslint-disable-line
         }[],
@@ -46,22 +46,22 @@ type TimeMarkerProps = {
          * are themselves objects representing inline CSS for each of
          * the pieces of the info marker.
          */
-        infoStyle: {
+        infoStyle?: {
             line: object, // eslint-disable-line
             box: object, // eslint-disable-line
             dot: object, // eslint-disable-line
-            label: any // eslint-disable-line
+            label: object // eslint-disable-line
         },
 
         /**
          * The width of the hover info box
          */
-        infoWidth: number,
+        infoWidth?: number,
 
         /**
          * The height of the hover info box
          */
-        infoHeight: number,
+        infoHeight?: number,
 
         /**
          * Display the info box at all. If you don't have any values to show and just
@@ -86,22 +86,22 @@ type TimeMarkerProps = {
         /**
          * The time format used for display of the time above the info box.
          */
-        timeFormat: string | Function,
+        timeFormat?: string | Function,
 
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: Function,
+        timeScale?: Function,
 
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: number,
+        width?: number,
 
         /**
          * [Internal] The height supplied by the surrounding ChartContainer
          */
-        height: number
+        height?: number
     }
 
 export default class TimeMarker extends React.Component<TimeMarkerProps> {

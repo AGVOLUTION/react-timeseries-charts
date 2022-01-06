@@ -48,7 +48,7 @@ type LabelAxisProps = {
          * This expects an array of objects. Each object is of the form:
          *     {label: "Speed", value: "26.2 mph"}.
          */
-        values: {
+        values?: {
                 label: string, // eslint-disable-line
                 value: number | string
             }[],
@@ -56,7 +56,7 @@ type LabelAxisProps = {
         /**
          * Width to provide the values
          */
-        valWidth: number,
+        valWidth?: number,
 
         /**
          * Max value of the axis scale
@@ -71,17 +71,17 @@ type LabelAxisProps = {
         /**
          * If values are numbers, use this format string
          */
-        format: string,
+        format?: string,
 
         /**
          * The width of the axis
          */
-        width: number,
+        width?: number,
 
         /**
          * The height of the axis
          */
-        height: number,
+        height?: number,
 
         /**
          * Object specifying the CSS by which the label axis can be styled. The object can contain:
@@ -89,7 +89,7 @@ type LabelAxisProps = {
          * to the axis label, axis values and axis line respectively.
          *
          */
-        style: {
+        style?: {
             axis: object, // eslint-disable-line
             label: object, // eslint-disable-line
             values: object // esline-disable-line

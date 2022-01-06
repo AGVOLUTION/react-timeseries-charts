@@ -44,13 +44,13 @@ type ScatterChartProps<T extends Key> = {
          * represent a path to deep data in the underlying events
          * (i.e. reference into nested data structures)
          */
-        columns: string[],
+        columns?: string[],
 
         /**
          * Reference to the axis which provides the vertical scale for drawing. e.g.
          * specifying axis="trafficRate" would refer the y-scale to the YAxis of id="trafficRate".
          */
-        axis: string, // eslint-disable-line
+        axis?: string, // eslint-disable-line
 
         /**
          * The radius of the points in the scatter chart.
@@ -68,7 +68,7 @@ type ScatterChartProps<T extends Key> = {
          * }
          * ```
          */
-        radius: number | Function | Styler,
+        radius?: number | Function | Styler,
 
         /**
          * The style of the scatter chart drawing (using SVG CSS properties).
@@ -106,14 +106,14 @@ type ScatterChartProps<T extends Key> = {
          * 4 states (normal, highlighted, selected and muted) and the corresponding
          * CSS properties.
          */
-        style: object | Function,
+        style?: object | Function,
 
         /**
          * The style of the info box and connecting lines. The style should
          * be an object of the form { line, box }. Line and box are both objects
          * containing the inline CSS for those elements of the info tracker.
          */
-        infoStyle: {
+        infoStyle?: {
             line: object, // eslint-disable-line
             box: object // eslint-disable-line
         },
@@ -121,25 +121,25 @@ type ScatterChartProps<T extends Key> = {
         /**
          * The width of the hover info box
          */
-        infoWidth: number, // eslint-disable-line
+        infoWidth?: number, // eslint-disable-line
 
         /**
          * The height of the hover info box
          */
-        infoHeight: number, // eslint-disable-line
+        infoHeight?: number, // eslint-disable-line
 
         /**
          * The vertical offset in pixels of the EventMarker info box from the
          * top of the chart.
          */
-        infoOffsetY: number,
+        infoOffsetY?: number,
 
         /**
          * The values to show in the info box. This is an array of
          * objects, with each object specifying the label and value
          * to be shown in the info box.
          */
-        info: {
+        info?: {
                 label: string, // eslint-disable-line
                 value: string // eslint-disable-line
             }[],
@@ -150,7 +150,7 @@ type ScatterChartProps<T extends Key> = {
          *
          * See also `onSelectionChange`
          */
-        selected: {
+        selected?: {
             event: Event,
             column: string
         },
@@ -159,7 +159,7 @@ type ScatterChartProps<T extends Key> = {
          * A callback that will be called when the selection changes. It will be called
          * with an object containing the event and column.
          */
-        onSelectionChange: Function,
+        onSelectionChange?: Function,
 
         /**
          * The highlighted dot, as an object containing the { event, column },
@@ -167,7 +167,7 @@ type ScatterChartProps<T extends Key> = {
          *
          * See also the prop `onMouseNear`.
          */
-        highlight: {
+        highlight?: {
             event: Event,
             column: string
         },
@@ -176,27 +176,27 @@ type ScatterChartProps<T extends Key> = {
          * Will be called with the nearest point to the cursor. The callback
          * will contain the point, which is a map of { event, column }.
          */
-        onMouseNear: Function,
+        onMouseNear?: Function,
 
         /**
          * [Internal] The timeScale supplied by the surrounding ChartContainer
          */
-        timeScale: Function,
+        timeScale?: Function,
 
         /**
          * [Internal] The yScale supplied by the associated YAxis
          */
-        yScale: Function,
+        yScale?: Function,
 
         /**
          * [Internal] The width supplied by the surrounding ChartContainer
          */
-        width: number,
+        width?: number,
 
         /**
          * [Internal] The height supplied by the surrounding ChartContainer
          */
-        height: number
+        height?: number
     };
 
 /**

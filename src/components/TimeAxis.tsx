@@ -48,16 +48,16 @@ type TimeAxisProps = {
         scale: Function,
         showGrid?: boolean,
         angled?: boolean,
-        gridHeight: number,
-        format: string | Function,
+        gridHeight?: number,
+        format?: string | Function,
         utc?: boolean,
-        style: {
+        style?: {
             label?: object, // eslint-disable-line
             values: object, // eslint-disable-line
             axis: object, // eslint-disable-line
-            ticks: any // eslint-disable-line
+            ticks: object // eslint-disable-line
         },
-        tickCount: number
+        tickCount?: number
     }
 
 /**

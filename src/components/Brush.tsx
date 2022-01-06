@@ -17,7 +17,7 @@ import { getElementOffset } from "../js/util";
 import { ScaleTime } from "d3-scale";
 
 type BrushProps = {
-        /**
+    /**
      * The timerange for the brush. Typically you would maintain this
      * as state on the surrounding page, since it would likely control
      * another page element, such as the range of the main chart. See
@@ -26,19 +26,22 @@ type BrushProps = {
      *
      * Takes a Pond TimeRange object.
      */
-        // timeRange: TimeRange,
-        timeRange: TimeRange,
-        /**
+    timeRange?: TimeRange,
+
+    /**
      * The brush is rendered as an SVG rect. You can specify the style
      * of this rect using this prop.
      */
-        style: object, //eslint-disable-line
-        /**
+    style?: object, //eslint-disable-line
+    
+    /**
      * The size of the invisible side handles. Defaults to 6 pixels.
      */
-        handleSize: number,
-        allowSelectionClear?: boolean,
-        /**
+    handleSize?: number,
+    
+    allowSelectionClear?: boolean,
+
+    /**
      * A callback which will be called if the brush range is changed by
      * the user. It is called with a Pond TimeRange object. Note that if
      * `allowSelectionClear` is set to true, then this can also be called
@@ -46,20 +49,23 @@ type BrushProps = {
      * this case it will be called with null as the TimeRange. You can
      * use this to reset the selection, perhaps to some initial range.
      */
-        onTimeRangeChanged: Function,
-        /**
+    onTimeRangeChanged?: Function,
+    
+    /**
      * [Internal] The timeScale supplied by the surrounding ChartContainer
      */
-        timeScale: ScaleTime<any, any>,
-        /**
+    timeScale?: ScaleTime<any, any>,
+    
+    /**
      * [Internal] The width supplied by the surrounding ChartContainer
      */
-        width: number,
-        /**
+    width?: number,
+
+    /**
      * [Internal] The height supplied by the surrounding ChartContainer
      */
-        height: number
-    }
+    height?: number
+}
 
 /**
  * Renders a brush with the range defined in the prop `timeRange`.

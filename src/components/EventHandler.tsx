@@ -23,14 +23,14 @@ type EventHandlerProps = {
         scale: ScaleTime<any, any>,
         width: number,
         height: number,
-        maxTime: Date,
-        minTime: Date,
-        minDuration: number,
-        onZoom: Function,
-        onMouseMove: Function,
-        onMouseOut: Function,
-        onMouseClick: Function,
-        onContextMenu: Function
+        maxTime?: Date,
+        minTime?: Date,
+        minDuration?: number,
+        onZoom?: Function,
+        onMouseMove?: Function,
+        onMouseOut?: Function,
+        onMouseClick?: Function,
+        onContextMenu?: Function
     }
 
 /**
