@@ -28,7 +28,7 @@ const defaultStyle: any = {
     }
 };
 
-type BaselineProps = {
+export type BaselineProps = {
         /**
          * Show or hide this chart
          */

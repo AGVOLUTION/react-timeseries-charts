@@ -125,7 +125,7 @@ function getAggregatedSeries<T extends Key>(series: TimeSeries<T>, column, aggre
     return aggregatedSeries;
 }
 
-type BoxChartProps<T extends Key> = {
+export type BoxChartProps<T extends Key> = {
 
         /**
          * Reference to the axis which provides the vertical scale for drawing.

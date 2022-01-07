@@ -32,7 +32,7 @@ const defaultStyle: any = {
     }
 };
 
-type LabelAxisProps = {
+export type LabelAxisProps = {
         /**
          * The label to show as the axis.
          */

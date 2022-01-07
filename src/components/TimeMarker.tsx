@@ -19,7 +19,7 @@ import "moment-duration-format";
 import ValueList from "./ValueList";
 import Label from "./Label";
 
-type TimeMarkerProps = {
+export type TimeMarkerProps = {
         /**
          * Show or hide this chart
          */

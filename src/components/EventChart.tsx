@@ -14,7 +14,7 @@ import React from "react";
 import PropTypes, { InferProps } from "prop-types";
 import { TimeSeries, Event, Key } from "pondjs";
 
-type EventChartProps<T extends Key> = {
+export type EventChartProps<T extends Key> = {
     /**
      * Show or hide this chart
      */

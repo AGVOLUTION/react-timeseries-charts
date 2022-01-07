@@ -103,7 +103,7 @@ const EventIndex = ({ index, format }: { index?: Index, format?: string | Functi
     );
 };
 
-type EventMarkerProps = Partial<{
+export type EventMarkerProps = Partial<{
         type?: "point" | "flag",
 
         /**

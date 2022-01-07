@@ -36,6 +36,23 @@ const defaultStyle: any = {
     }
 };
 
+export type LegendItemProps = {
+    itemKey: string,
+    label?: string,
+    value?: any,
+
+    symbolStyle?: object,
+    labelStyle?: object,
+    valueStyle?: object,
+    
+    symbolType?: "swatch" | "line" | "dot",
+    symbolWidth?: number,
+    symbolHeight?: number,
+    
+    onSelectionChange?: Function,
+    onHighlightChange?: Function,
+}
+
 /**
  * Legends are simple to define.
  *
@@ -135,7 +152,7 @@ const defaultStyle: any = {
  * containing symbol, label and value styles.
  */
 
-class LegendItem extends React.Component<any> {
+export class LegendItem extends React.Component<LegendItemProps> {
     handleClick(e, key) {
         e.stopPropagation();
         if (this.props.onSelectionChange) {
@@ -257,7 +274,7 @@ class LegendItem extends React.Component<any> {
     }
 }
 
-type LegendProps = {
+export type LegendProps = {
         /**
          * The overall style of the legend items, either a color "swatch", a
          * colored "line", or a "dot".
@@ -296,7 +313,7 @@ type LegendProps = {
             style?: object, // eslint-disable-line
             labelStyle?: object, // eslint-disable-line
             value?: any, // eslint-disable-line
-            symbolType?: any, // eslint-disable-line
+            symbolType?: "line" | "dot" | "swatch", // eslint-disable-line
         }[],
 
         /**
@@ -452,11 +469,11 @@ export default class Legend extends React.Component<LegendProps> {
             return (
                 <LegendItem
                     key={key}
-                    type={type}
+                    // type={type}
                     itemKey={key}
                     label={label}
                     value={value}
-                    symbolType={symbolType}
+                    symbolType={symbolType || type}
                     symbolWidth={symbolWidth}
                     symbolHeight={symbolHeight}
                     symbolStyle={symbolStyle}

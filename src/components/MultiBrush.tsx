@@ -16,7 +16,7 @@ import { TimeRange } from "pondjs";
 import { getElementOffset } from "../js/util";
 import { ScaleTime } from "d3-scale";
 
-type MultiBrushProps = {
+export type MultiBrushProps = {
         /**
          * The timeranges for the brushes. Typically you would maintain this
          * as state on the surrounding page, since it would likely control

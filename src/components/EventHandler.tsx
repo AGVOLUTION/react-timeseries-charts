@@ -17,7 +17,7 @@ import { TimeRange } from "pondjs";
 import { getElementOffset } from "../js/util";
 import { ScaleTime } from "d3-scale";
 
-type EventHandlerProps = {
+export type EventHandlerProps = {
         enablePanZoom?: boolean,
         enableDragZoom?: boolean,
         scale: ScaleTime<any, any>,

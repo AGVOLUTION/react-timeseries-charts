@@ -26,7 +26,7 @@ const defaultStyle: any = {
     muted: { fill: "steelblue", opacity: 0.4 }
 };
 
-type ScatterChartProps<T extends Key> = {
+export type ScatterChartProps<T extends Key> = {
         /**
          * Show or hide this chart
          */

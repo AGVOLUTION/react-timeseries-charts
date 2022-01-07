@@ -70,7 +70,7 @@ const defaultTrackerStyle: any = {
     }
 };
 
-type ChartContainerProps = {
+export type ChartContainerProps = {
         /**
          * A [Pond TimeRange](https://esnet-pondjs.appspot.com/#/timerange) representing the
          * begin and end time of the chart.

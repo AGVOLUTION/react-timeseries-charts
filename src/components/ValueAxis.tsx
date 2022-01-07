@@ -11,21 +11,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-/**
- * Renders a 'axis' that display a label for a current tracker value:
- * ```
- *      ----+----------------+
- *          |     56.2G      |
- *          |      bps       |
- *          |                |
- *      ----+----------------+
- * ```
- * This would be used when you have many rows of data and the user is required
- * to interact with the data to see actual values. You would use this at the
- * end of the row and supply it with the current value. See the cycling example
- * for how that would all work.
- */
-const ValueAxis = ({ width, height, value, detail }: {
+export type ValueAxisProps = {
     /**
      * Show or hide this
      */
@@ -51,7 +37,23 @@ const ValueAxis = ({ width, height, value, detail }: {
      * [Internal] The height of the axis
      */
     height?: number
-}) => {
+}
+
+/**
+ * Renders a 'axis' that display a label for a current tracker value:
+ * ```
+ *      ----+----------------+
+ *          |     56.2G      |
+ *          |      bps       |
+ *          |                |
+ *      ----+----------------+
+ * ```
+ * This would be used when you have many rows of data and the user is required
+ * to interact with the data to see actual values. You would use this at the
+ * end of the row and supply it with the current value. See the cycling example
+ * for how that would all work.
+ */
+const ValueAxis = ({ width, height, value, detail }: ValueAxisProps) => {
     const labelStyle: any = {
         fill: "#666",
         fontSize: 20,

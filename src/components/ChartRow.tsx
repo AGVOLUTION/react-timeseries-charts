@@ -47,7 +47,7 @@ function createScale(yaxis, type, min, max, y0, y1) {
     return scale;
 }
 
-type ChartRowProps = {
+export type ChartRowProps = {
         /**
          * The height of the row.
          */

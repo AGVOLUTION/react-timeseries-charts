@@ -13,7 +13,7 @@ import PropTypes, { InferProps } from "prop-types";
 import { TimeRange } from "pondjs";
 import { ScaleTime } from "d3-scale";
 
-type TimeRangeMarkerProps = {
+export type TimeRangeMarkerProps = {
         /**
          * Show or hide this marker
          */

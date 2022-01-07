@@ -43,16 +43,7 @@ function mergeStyles(style, isCentered) {
     };
 }
 
-/**
- * Renders a simple label surrounded by a box within in svg
- *
- *      +----------------+
- *      | My label       |
- *      |                |
- *      +----------------+
- */
-
-const Label = ({ label, style, align, width, height }: {
+export type LabelProps = {
     /**
      * Where to position the label, either "left" or "center" within the box
      */
@@ -78,7 +69,18 @@ const Label = ({ label, style, align, width, height }: {
      * The height of the rectangle to render into
      */
     height?: number
-}) => {
+}
+
+/**
+ * Renders a simple label surrounded by a box within in svg
+ *
+ *      +----------------+
+ *      | My label       |
+ *      |                |
+ *      +----------------+
+ */
+
+const Label = ({ label, style, align, width, height }: LabelProps) => {
     const { boxStyle, labelStyle } = mergeStyles(style, align === "center");
 
     const posx = align === "center" ? parseInt(width / 2 as any, 10) : 10;

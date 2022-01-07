@@ -50,7 +50,7 @@ const defaultStyle: any = {
     }
 };
 
-type YAxisProps = {
+export type YAxisProps = {
 
         isInnerAxis?: boolean,
         chartExtent?: any,

@@ -26,7 +26,7 @@ const defaultStyle: any = {
     muted: { stroke: "steelblue", fill: "none", opacity: 0.4, strokeWidth: 1 }
 };
 
-type LineChartProps<T extends Key> = {
+export type LineChartProps<T extends Key> = {
         /**
          * Show or hide this chart
          */

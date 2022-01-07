@@ -24,7 +24,7 @@ const defaultStyle: any = {
     muted: { fill: "steelblue", opacity: 0.4 }
 };
 
-type BarChartProps<T extends Key> = {
+export type BarChartProps<T extends Key> = {
         /**
          * Show or hide this chart
          */

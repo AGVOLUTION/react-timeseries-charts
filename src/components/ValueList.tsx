@@ -43,7 +43,7 @@ function mergeStyles(style, isCentered) {
     };
 }
 
-type ValueListProps = {
+export type ValueListProps = {
     /**
      * Where to position the label, either "left" or "center" within the box
      */

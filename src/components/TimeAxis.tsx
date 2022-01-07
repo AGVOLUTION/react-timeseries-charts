@@ -44,7 +44,7 @@ const defaultStyle: any = {
     }
 };
 
-type TimeAxisProps = {
+export type TimeAxisProps = {
         scale: Function,
         showGrid?: boolean,
         angled?: boolean,

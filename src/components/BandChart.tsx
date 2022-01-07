@@ -132,7 +132,7 @@ function getAggregatedSeries(series, column, aggregation = defaultAggregation) {
 }
 
 
-type BandChartProps<T extends Key> = {
+export type BandChartProps<T extends Key> = {
         /**
          * What [Pond TimeSeries](http://software.es.net/pond#timeseries)
          * data to visualize. See general notes on the BandChart.

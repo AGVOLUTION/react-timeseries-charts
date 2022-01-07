@@ -36,7 +36,7 @@ const defaultStyle = {
     }
 };
 
-type AreaChartProps<T extends Key> = {
+export type AreaChartProps<T extends Key> = {
         /**
          * What [Pond TimeSeries](https://esnet-pondjs.appspot.com/#/timeseries) data to visualize
          */
